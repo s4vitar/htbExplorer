@@ -1,0 +1,154 @@
+#!/bin/bash
+
+# Author: Marcelo Vázquez (aka S4vitar)
+
+#Colours
+declare -r greenColour="\e[0;32m\033[1m"
+declare -r endColour="\033[0m\e[0m"
+declare -r redColour="\e[0;31m\033[1m"
+declare -r blueColour="\e[0;34m\033[1m"
+declare -r yellowColour="\e[0;33m\033[1m"
+declare -r purpleColour="\e[0;35m\033[1m"
+declare -r turquoiseColour="\e[0;36m\033[1m"
+declare -r grayColour="\e[0;37m\033[1m"
+
+# Global Variables
+declare -r API_TOKEN=$1
+declare -r USER_AGENT="User-Agent: htbExplorer"
+declare -r url_machines_get_all="https://hackthebox.eu/api/machines/get/all"
+declare -r tmp_file="tmp.json"
+
+trap ctrl_c INT
+
+function ctrl_c(){
+    echo -e "\n\n${redColour}[!] Exiting...${endColour}"
+    rm $tmp_file getAllMachines 2>/dev/null
+    exit 1
+}
+
+function printTable(){
+
+    local -r delimiter="${1}"
+    local -r data="$(removeEmptyLines "${2}")"
+
+    if [[ "${delimiter}" != '' && "$(isEmptyString "${data}")" = 'false' ]]
+    then
+        local -r numberOfLines="$(wc -l <<< "${data}")"
+
+        if [[ "${numberOfLines}" -gt '0' ]]
+        then
+            local table=''
+            local i=1
+
+            for ((i = 1; i <= "${numberOfLines}"; i = i + 1))
+            do
+                local line=''
+                line="$(sed "${i}q;d" <<< "${data}")"
+
+                local numberOfColumns='0'
+                numberOfColumns="$(awk -F "${delimiter}" '{print NF}' <<< "${line}")"
+
+                if [[ "${i}" -eq '1' ]]
+                then
+                    table="${table}$(printf '%s#+' "$(repeatString '#+' "${numberOfColumns}")")"
+                fi
+
+                table="${table}\n"
+
+                local j=1
+
+                for ((j = 1; j <= "${numberOfColumns}"; j = j + 1))
+                do
+                    table="${table}$(printf '#| %s' "$(cut -d "${delimiter}" -f "${j}" <<< "${line}")")"
+                done
+
+                table="${table}#|\n"
+
+                if [[ "${i}" -eq '1' ]] || [[ "${numberOfLines}" -gt '1' && "${i}" -eq "${numberOfLines}" ]]
+                then
+                    table="${table}$(printf '%s#+' "$(repeatString '#+' "${numberOfColumns}")")"
+                fi
+            done
+
+            if [[ "$(isEmptyString "${table}")" = 'false' ]]
+            then
+                echo -e "${table}" | column -s '#' -t | awk '/^\+/{gsub(" ", "-", $0)}1'
+            fi
+        fi
+    fi
+}
+
+function removeEmptyLines(){
+
+    local -r content="${1}"
+    echo -e "${content}" | sed '/^\s*$/d'
+}
+
+function repeatString(){
+
+    local -r string="${1}"
+    local -r numberToRepeat="${2}"
+
+    if [[ "${string}" != '' && "${numberToRepeat}" =~ ^[1-9][0-9]*$ ]]
+    then
+        local -r result="$(printf "%${numberToRepeat}s")"
+        echo -e "${result// /${string}}"
+    fi
+}
+
+function isEmptyString(){
+
+    local -r string="${1}"
+
+    if [[ "$(trimString "${string}")" = '' ]]
+    then
+        echo 'true' && return 0
+    fi
+
+    echo 'false' && return 1
+}
+
+function trimString(){
+
+    local -r string="${1}"
+    sed 's,^[[:blank:]]*,,' <<< "${string}" | sed 's,[[:blank:]]*$,,'
+}
+
+function generateFiles(){
+
+    echo '' > $tmp_file
+
+    while [ "$(cat $tmp_file | wc -l)" != "0" ]; do
+        curl -s -H "$USER_AGENT" "$url_machines_get_all?api_token=$API_TOKEN" -X GET -L | tr "'" '"' | sed 's/None/\"None\"/g' | sed 's/True/\"True\"/g' | sed 's/False/\"False\"/g' > $tmp_file
+    done
+}
+
+function getAllMachines(){
+
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired" >> getAllMachines
+
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat tmp.json | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\"]" | tr -d '"' | xargs | tr ' ' ',')
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null" ]; then
+            break
+        fi
+
+        echo $field_value >> getAllMachines
+        let id+=1
+    done
+
+    printTable ',' "$(cat getAllMachines)"
+}
+
+function cleanFiles(){
+    rm machine_names $tmp_file getAllMachines 2>/dev/null
+}
+
+if [ ! "$API_TOKEN" ]; then
+	echo -e "\n${redColour}[!]${endColour}${blueColour} Usage: ./htbExplorer <API-TOKEN>${endColour}\n"
+else
+    generateFiles
+    getAllMachines
+    cleanFiles
+fi
+
