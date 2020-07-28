@@ -145,6 +145,9 @@ function cleanFiles(){
 
 function helpPanel(){
     echo -e "\n${redColour}[!] Usage: ./htbExplorer${endColour}\n"
+    echo -e "\t${grayColour}[-t]${endColour}${yellowColour} API Token${endColour}"
+    echo -e "\t${grayColour}[-e]${endColour}${yellowColour} Exploration Mode${endColour}"
+    echo -e "\t\t${purpleColour}all_machines${endColour}${yellowColour}: List all machines${endColour}"
     exit 1
 }
 
@@ -157,7 +160,7 @@ while getopts ":e:t:h:" arg; do
 done
 
 if [ $explorer_mode ] && [ $API_TOKEN ]; then
-    if [ "$(echo $explorer_mode)" == "active_machines" ]; then
+    if [ "$(echo $explorer_mode)" == "all_machines" ]; then
         generateFiles
         getAllMachines
         cleanFiles
