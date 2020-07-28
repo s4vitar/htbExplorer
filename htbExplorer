@@ -197,6 +197,10 @@ function getActiveLinuxMachines(){
 
     sed -i '/Is Active/!d' getActiveLinuxMachines
 	sed -i '/Windows/d' getActiveLinuxMachines
+    sed -i '/Other/d' getActiveLinuxMachines
+    sed -i '/Solaris/d' getActiveLinuxMachines
+    sed -i '/OpenBSD/d' getActiveLinuxMachines
+    sed -i '/FreeBSD/d' getActiveLinuxMachines
     sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' getActiveLinuxMachines
 
     printTable ',' "$(cat getActiveLinuxMachines)"
@@ -219,11 +223,112 @@ function getActiveWindowsMachines(){
 
     sed -i '/Is Active/!d' getActiveWindowsMachines
 	sed -i '/Linux/d' getActiveWindowsMachines
-	sed -i '/OpenBSD/d' getActiveWindowsMachines
+	sed -i '/FreeBSD/d' getActiveWindowsMachines
+    sed -i '/OpenBSD/d' getActiveWindowsMachines
+    sed -i '/Other/d' getActiveWindowsMachines
+    sed -i '/Solaris/d' getActiveWindowsMachines
     sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' getActiveWindowsMachines
 
     printTable ',' "$(cat getActiveWindowsMachines)"
     rm getActiveWindowsMachines 2>/dev/null
+}
+
+function getActiveFreebsdMachines(){
+
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getActiveFreebsdMachines
+
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+            break
+        fi
+
+        echo $field_value | sed 's/true/Yes/g' | sed 's/false/No/g' | sed 's/null/Is Active/' >> getActiveFreebsdMachines
+        let id+=1
+    done
+
+    sed -i '/Is Active/!d' getActiveFreebsdMachines
+	sed -i '/Linux/d' getActiveFreebsdMachines
+    sed -i '/Windows/d' getActiveFreebsdMachines
+    sed -i '/OpenBSD/d' getActiveFreebsdMachines
+    sed -i '/Other/d' getActiveFreebsdMachines
+    sed -i '/Solaris/d' getActiveFreebsdMachines
+    sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' getActiveFreebsdMachines
+
+    printTable ',' "$(cat getActiveFreebsdMachines)"
+    rm getActiveFreebsdMachines 2>/dev/null
+}
+
+function getRetiredWindowsMachines(){
+
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredWindowsMachines
+
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+            break
+        fi
+
+        echo $field_value | sed 's/true/Yes/g' | sed 's/false/No/g' | sed 's/null/Is Active/' >> getRetiredWindowsMachines
+        let id+=1
+    done
+
+    sed -i '/Is Active/d' getRetiredWindowsMachines
+	sed -i '/Linux/d' getRetiredWindowsMachines
+	sed -i '/FreeBSD/d' getRetiredWindowsMachines
+    sed -i '/OpenBSD/d' getRetiredWindowsMachines
+    sed -i '/Other/d' getRetiredWindowsMachines
+    sed -i '/Solaris/d' getRetiredWindowsMachines
+    printTable ',' "$(cat getRetiredWindowsMachines)"
+    rm getRetiredWindowsMachines 2>/dev/null
+}
+
+function getRetiredFreebsdMachines(){
+
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredFreebsdMachines
+
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+            break
+        fi
+
+        echo $field_value | sed 's/true/Yes/g' | sed 's/false/No/g' | sed 's/null/Is Active/' >> getRetiredFreebsdMachines
+        let id+=1
+    done
+
+    sed -i '/Is Active/d' getRetiredFreebsdMachines
+	sed -i '/Linux/d' getRetiredFreebsdMachines
+    sed -i '/Windows/d' getRetiredFreebsdMachines
+    sed -i '/OpenBSD/d' getRetiredFreebsdMachines
+    sed -i '/Other/d' getRetiredFreebsdMachines
+    sed -i '/Solaris/d' getRetiredFreebsdMachines
+    printTable ',' "$(cat getRetiredFreebsdMachines)"
+    rm getRetiredFreebsdMachines 2>/dev/null
+}
+
+function getRetiredLinuxMachines(){
+
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredLinuxMachines
+
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+            break
+        fi
+
+        echo $field_value | sed 's/true/Yes/g' | sed 's/false/No/g' | sed 's/null/Is Active/' >> getRetiredLinuxMachines
+        let id+=1
+    done
+
+    sed -i '/Is Active/d' getRetiredLinuxMachines
+	sed -i '/Windows/d' getRetiredLinuxMachines
+	sed -i '/FreeBSD/d' getRetiredLinuxMachines
+    sed -i '/OpenBSD/d' getRetiredLinuxMachines
+    sed -i '/Other/d' getRetiredLinuxMachines
+    sed -i '/Solaris/d' getRetiredLinuxMachines
+    printTable ',' "$(cat getRetiredLinuxMachines)"
+    rm getRetiredLinuxMachines 2>/dev/null
 }
 
 function searchMachineName(){
@@ -248,6 +353,28 @@ function searchMachineName(){
     rm searchMachineName 2>/dev/null
 }
 
+function searchIPAddress(){
+
+    ipAddress=$1
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> searchIPAddress
+
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+            break
+        fi
+
+        echo $field_value | sed 's/true/Yes/g' | sed 's/false/No/g' | sed 's/null/Is Active/' >> searchIPAddress
+        let id+=1
+    done
+
+	sed -i "/$ipAddress,/!d" searchIPAddress
+	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' searchIPAddress
+
+    printTable ',' "$(cat searchIPAddress)"
+    rm searchIPAddress 2>/dev/null
+}
+
 function helpPanel(){
     echo -e "\n${redColour}[!] Usage: ./htbExplorer${endColour}\n"
     echo -e "\t${grayColour}[-t]${endColour}${yellowColour} API Token${endColour} ${redColour}[Required]${endColour}\n"
@@ -257,19 +384,25 @@ function helpPanel(){
     echo -e "\t${grayColour}[-e]${endColour}${yellowColour} Exploration Mode${endColour}"
     echo -e "\t\t${purpleColour}all_machines${endColour}${yellowColour}: List all machines${endColour}"
     echo -e "\t\t${purpleColour}active_machines${endColour}${yellowColour}: List active machines${endColour}"
+    echo -e "\t\t${purpleColour}retired_machines${endColour}${yellowColour}: List retired machines${endColour}"
     echo -e "\t\t${purpleColour}active_linux_machines${endColour}${yellowColour}: List active Linux machines${endColour}"
     echo -e "\t\t${purpleColour}active_windows_machines${endColour}${yellowColour}: List active Windows machines${endColour}"
-    echo -e "\t\t${purpleColour}retired_machines${endColour}${yellowColour}: List retired machines${endColour}\n"
+    echo -e "\t\t${purpleColour}active_freebsd_machines${endColour}${yellowColour}: List active FreeBSD machines${endColour}"
+    echo -e "\t\t${purpleColour}retired_linux_machines${endColour}${yellowColour}: List retired Linux machines${endColour}"
+    echo -e "\t\t${purpleColour}retired_windows_machines${endColour}${yellowColour}: List retired Windows machines${endColour}"
+    echo -e "\t\t${purpleColour}retired_freebsd_machines${endColour}${yellowColour}: List retired FreeBSD machines${endColour}\n"
     echo -e "\t${grayColour}[-s]${endColour}${yellowColour} Search by machine name${endColour} ${blueColour}(Example: -s Rope)${endColour}\n"
+    echo -e "\t${grayColour}[-i]${endColour}${yellowColour} Search by IP Address${endColour}\n"
     exit 1
 }
 
-while getopts ":e:t:g:s:h:" arg; do
+while getopts ":e:t:g:s:i:h:" arg; do
 	case $arg in
 		e) explorer_mode=$OPTARG;;
         t) API_TOKEN=$OPTARG;;
         g) generate_files=$OPTARG;;
 		s) search_machine_name=$OPTARG;;
+        i) ip_address=$OPTARG;;
 		h) helpPanel;;
 	esac
 done
@@ -287,6 +420,11 @@ if [ $search_machine_name ]; then
 	exit 0
 fi
 
+if [ $ip_address ]; then
+    searchIPAddress $ip_address
+    exit 0
+fi
+
 if [ $explorer_mode ] && [ $API_TOKEN ] && [ $generate_files ]; then
     if [ "$(echo $explorer_mode)" == "all_machines" ]; then
         getAllMachines
@@ -298,7 +436,15 @@ if [ $explorer_mode ] && [ $API_TOKEN ] && [ $generate_files ]; then
 		getActiveLinuxMachines
 	elif [ "$(echo $explorer_mode)" == "active_windows_machines" ]; then
 		getActiveWindowsMachines
-	fi
+	elif [ "$(echo $explorer_mode)" == "retired_linux_machines" ]; then
+		getRetiredLinuxMachines
+	elif [ "$(echo $explorer_mode)" == "retired_windows_machines" ]; then
+		getRetiredWindowsMachines
+    elif [ "$(echo $explorer_mode)" == "active_freebsd_machines" ]; then
+        getActiveFreebsdMachines
+    elif [ "$(echo $explorer_mode)" == "retired_freebsd_machines" ]; then
+        getRetiredFreebsdMachines
+    fi
 else
     helpPanel
 fi
