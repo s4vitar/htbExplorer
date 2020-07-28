@@ -576,10 +576,14 @@ function resetMachineName(){
 
 function shoutBoxMessages(){
     shoutbox_chat_value=$1
-    echo -e "${grayColour}"
-    curl -s -X POST "$url_shoutbox_messages$shoutbox_chat_value?api_token=$API_TOKEN" -L | jq '.["html"]' | tr -d '[]' | html2text | grep ":" | awk '{print $1}' FS="&" | sed 's/\">//' | grep ":" | sed 's/became a/became a VIP/g' | sed 's/(+1/+1/g' | sed 's/01\\//' | sed 's/  / /g'
+    curl -s -X POST "$url_shoutbox_messages$shoutbox_chat_value?api_token=$API_TOKEN" -L | jq '.["html"]' | tr -d '[]' | html2text | grep ":" | awk '{print $1}' FS="&" | sed 's/\">//' | grep ":" | sed 's/became a/became a VIP/g' | sed 's/(+1/+1/g' | sed 's/01\\//' | sed 's/  / /g' > shoutBox.tmp
 
-    echo -ne "${endColour}"; tput cnorm
+    cat shoutBox.tmp | while read line_in_shoutbox; do
+        user=$(echo $line_in_shoutbox | awk '{print $4}')
+        echo -e "${blueColour}[$user]:${endColour}${grayColour} $line_in_shoutbox${endColour}"
+    done
+
+    rm shoutBox.tmp 2>/dev/null; tput cnorm
 }
 
 function helpPanel(){
