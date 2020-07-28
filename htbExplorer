@@ -17,6 +17,7 @@ declare -r USER_AGENT="User-Agent: htbExplorer"
 declare -r url_machines_get_all="https://hackthebox.eu/api/machines/get/all"
 declare -r url_global_data="https://www.hackthebox.eu/api/stats/global"
 declare -r url_user_id="https://www.hackthebox.eu/api/user/id"
+declare -r url_reset_machine="https://www.hackthebox.eu/api/vm/reset/"
 declare -r tmp_file="tmp.json"
 
 trap ctrl_c INT
@@ -138,12 +139,12 @@ function getGlobalData(){
 function getAllMachines(){
 
     getGlobalData
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getAllMachines
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getAllMachines
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
 
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
@@ -160,7 +161,6 @@ function getAllMachines(){
 function getActiveMachines(){
 
     getGlobalData
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getActiveMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
         field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
@@ -184,11 +184,11 @@ function getActiveMachines(){
 function getRetiredMachines(){
 
     getGlobalData
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredMachines
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getRetiredMachines
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
@@ -207,11 +207,10 @@ function getRetiredMachines(){
 function getActiveLinuxMachines(){
 
     getGlobalData
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getActiveLinuxMachines
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
@@ -225,7 +224,7 @@ function getActiveLinuxMachines(){
     sed -i '/Solaris/d' getActiveLinuxMachines
     sed -i '/OpenBSD/d' getActiveLinuxMachines
     sed -i '/FreeBSD/d' getActiveLinuxMachines
-    sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' getActiveLinuxMachines
+    sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getActiveLinuxMachines
 
     echo -ne "${greenColour}"
     printTable ',' "$(cat getActiveLinuxMachines)"
@@ -236,11 +235,10 @@ function getActiveLinuxMachines(){
 function getActiveWindowsMachines(){
 
     getGlobalData
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getActiveWindowsMachines
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
@@ -254,7 +252,7 @@ function getActiveWindowsMachines(){
     sed -i '/OpenBSD/d' getActiveWindowsMachines
     sed -i '/Other/d' getActiveWindowsMachines
     sed -i '/Solaris/d' getActiveWindowsMachines
-    sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' getActiveWindowsMachines
+    sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getActiveWindowsMachines
 
     echo -ne "${greenColour}"
     printTable ',' "$(cat getActiveWindowsMachines)"
@@ -265,11 +263,10 @@ function getActiveWindowsMachines(){
 function getActiveFreebsdMachines(){
 
     getGlobalData
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getActiveFreebsdMachines
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
@@ -283,7 +280,7 @@ function getActiveFreebsdMachines(){
     sed -i '/OpenBSD/d' getActiveFreebsdMachines
     sed -i '/Other/d' getActiveFreebsdMachines
     sed -i '/Solaris/d' getActiveFreebsdMachines
-    sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' getActiveFreebsdMachines
+    sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getActiveFreebsdMachines
 
     echo -ne "${greenColour}"
     printTable ',' "$(cat getActiveFreebsdMachines)"
@@ -294,11 +291,10 @@ function getActiveFreebsdMachines(){
 function getActiveOpenbsdMachines(){
 
     getGlobalData
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getActiveOpenbsdMachines
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
@@ -312,7 +308,7 @@ function getActiveOpenbsdMachines(){
     sed -i '/FreeBSD/d' getActiveOpenbsdMachines
     sed -i '/Other/d' getActiveOpenbsdMachines
     sed -i '/Solaris/d' getActiveOpenbsdMachines
-    sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' getActiveOpenbsdMachines
+    sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getActiveOpenbsdMachines
     
     echo -ne "${greenColour}"
     printTable ',' "$(cat getActiveOpenbsdMachines)"
@@ -323,11 +319,10 @@ function getActiveOpenbsdMachines(){
 function getActiveOtherMachines(){
 
     getGlobalData
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getActiveOtherMachines
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
@@ -341,7 +336,7 @@ function getActiveOtherMachines(){
     sed -i '/FreeBSD/d' getActiveOtherMachines
     sed -i '/OpenBSD/d' getActiveOtherMachines
     sed -i '/Solaris/d' getActiveOtherMachines
-    sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' getActiveOtherMachines
+    sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getActiveOtherMachines
 
     echo -ne "${greenColour}"
     printTable ',' "$(cat getActiveOtherMachines)"
@@ -352,11 +347,11 @@ function getActiveOtherMachines(){
 function getRetiredWindowsMachines(){
 
     getGlobalData
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredWindowsMachines
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getRetiredWindowsMachines
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
@@ -380,11 +375,11 @@ function getRetiredWindowsMachines(){
 function getRetiredFreebsdMachines(){
 
     getGlobalData
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredFreebsdMachines
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getRetiredFreebsdMachines
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
@@ -408,11 +403,11 @@ function getRetiredFreebsdMachines(){
 function getRetiredOpenbsdMachines(){
  
     getGlobalData
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredOpenbsdMachines
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getRetiredOpenbsdMachines
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
@@ -436,11 +431,11 @@ function getRetiredOpenbsdMachines(){
 function getRetiredLinuxMachines(){
 
     getGlobalData
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredLinuxMachines
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getRetiredLinuxMachines
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
@@ -464,11 +459,11 @@ function getRetiredLinuxMachines(){
 function getRetiredOtherMachines(){
 
     getGlobalData
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredOtherMachines
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getRetiredOtherMachines
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
@@ -493,11 +488,10 @@ function searchMachineName(){
 
     getGlobalData
 	s_machine_name=$1
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> searchMachineName
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
@@ -506,7 +500,7 @@ function searchMachineName(){
     done
 
 	sed -i "/$s_machine_name/!d" searchMachineName
-	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' searchMachineName
+	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' searchMachineName
 
     printTable ',' "$(cat searchMachineName)"
     tput cnorm; rm searchMachineName 2>/dev/null
@@ -516,11 +510,10 @@ function searchIPAddress(){
 
     getGlobalData
     ipAddress=$1
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> searchIPAddress
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
@@ -529,9 +522,11 @@ function searchIPAddress(){
     done
 
 	sed -i "/$ipAddress,/!d" searchIPAddress
-	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' searchIPAddress
+	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' searchIPAddress
 
+    echo -ne "${greenColour}"
     printTable ',' "$(cat searchIPAddress)"
+    echo -e "${endColour}"
     tput cnorm; rm searchIPAddress 2>/dev/null
 }
 
@@ -549,6 +544,33 @@ function searchUserName(){
         echo -ne "${endColour}"
         tput cnorm; rm searchUserName 2>/dev/null
     fi
+}
+
+function resetMachineName(){
+    generateFiles
+    reset_machineName=$1
+
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
+            break
+        fi
+
+        echo $field_value | sed 's/true/Yes/g' | sed 's/false/No/g' | sed 's/null/Is Active/' >> searchMachineName
+        let id+=1
+    done
+
+    machine_to_reset_id=$(cat searchMachineName | grep $reset_machineName | tr ',' ' ' | awk 'NF{print $NF}')
+    
+    response=$(curl -s -X POST "${url_reset_machine}${machine_to_reset_id}?api_token=$API_TOKEN" -L | jq '.["output"]' | tr -d '"')
+
+    if [ "$(echo $response)" == "null" ]; then
+        echo -e "\n${redColour}[!] It was not posible to restart the machine${endColour}\n"
+    else
+        echo -e "\n${grayColour}[*] $response${endColour}\n"
+    fi
+
+    tput cnorm; rm searchMachineName 2>/dev/null
 }
 
 function helpPanel(){
@@ -573,11 +595,12 @@ function helpPanel(){
     echo -e "\t\t${purpleColour}retired_other_machines${endColour}${yellowColour}:\t\t List retired Other machines${endColour}\n"
     echo -e "\t${grayColour}[-s]${endColour}${yellowColour} Search by machine name${endColour} ${blueColour}\t(Example: -s Rope)${endColour}\n"
     echo -e "\t${grayColour}[-i]${endColour}${yellowColour} Search by IP Address${endColour} ${blueColour}\t(Example: -i 10.10.10.10)${endColour}\n"
+    echo -e "\t${grayColour}[-r]${endColour}${yellowColour} Reset a machine${endColour} ${blueColour}\t\t(Example: -r Mantis)${endColour}\n"
     echo -e "\t${grayColour}[-f]${endColour}${yellowColour} Search username${endColour} ${blueColour}\t\t(Example: -f s4vitar)${endColour}\n"
     tput cnorm; exit 1
 }
 
-tput civis; while getopts ":e:t:g:s:i:f:h:" arg; do
+tput civis; while getopts ":e:t:g:s:i:f:r:h:" arg; do
 	case $arg in
 		e) explorer_mode=$OPTARG;;
         t) API_TOKEN=$OPTARG;;
@@ -585,6 +608,7 @@ tput civis; while getopts ":e:t:g:s:i:f:h:" arg; do
 		s) search_machine_name=$OPTARG;;
         i) ip_address=$OPTARG;;
         f) user_name=$OPTARG;;
+        r) reset_machineName=$OPTARG;;
 		h) helpPanel;;
 	esac
 done
@@ -609,6 +633,11 @@ fi
 
 if [ $user_name ] && [ $API_TOKEN ]; then
     searchUserName $user_name
+    exit 0
+fi
+
+if [ $reset_machineName ] && [ $API_TOKEN ]; then
+    resetMachineName $reset_machineName
     exit 0
 fi
 
