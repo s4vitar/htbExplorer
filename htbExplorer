@@ -33,7 +33,7 @@ function banner(){
        %%%%%%%%               %%%%%%%%    
        %%   %%%%%%%      .%%%%%%%  %%%    
        %%       #%%%%%%%%%%%#      %%%    ${endColour}${grayColour}htbExplorer - HackTheBox Terminal Client${endColour}${greenColour}
-       %%           %%%%#          %%%    
+       %%           %%%%#          %%%    ${endColour}${blueColour}\t\t\t     by S4vitar${endColour}${redColour} <3${endColour}${greenColour}
        %%            %%%           %%%    
        %%            %%%           %%%    
        %%%%%         %%%          %%%%    
@@ -610,6 +610,7 @@ function shoutBoxMessages(){
 
 function helpPanel(){
     banner
+#    echo; for i in $(seq 1 80); do echo -ne "${redColour}-"; done; echo -ne "${endColour}"
     echo -e "\n${redColour}[!] Usage: ./htbExplorer${endColour}"
     for i in $(seq 1 80); do echo -ne "${redColour}-"; done; echo -ne "${endColour}"
     echo -e "\n\n\t${grayColour}[-t]${endColour}${yellowColour} API Token${endColour} ${redColour}[Required]${endColour}\n"
