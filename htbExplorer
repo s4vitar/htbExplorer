@@ -429,7 +429,7 @@ function getRetiredOpenbsdMachines(){
     echo -ne "${greenColour}"
     printTable ',' "$(cat getRetiredOpenbsdMachines)"
     echo -e "${endColour}"
-    rm getRetiredOpenbsdMachines 2>/dev/null   
+    rm getRetiredOpenbsdMachines 2>/dev/null
 }
 
 function getRetiredLinuxMachines(){
@@ -541,19 +541,19 @@ function helpPanel(){
     echo -e "\t\t${purpleColour}0${endColour}${yellowColour}: No${endColour}"
     echo -e "\t\t${purpleColour}1${endColour}${yellowColour}: Yes${endColour}\n"
     echo -e "\t${grayColour}[-e]${endColour}${yellowColour} Exploration Mode${endColour}"
-    echo -e "\t\t${purpleColour}all_machines${endColour}${yellowColour}: List all machines${endColour}"
-    echo -e "\t\t${purpleColour}active_machines${endColour}${yellowColour}: List active machines${endColour}"
-    echo -e "\t\t${purpleColour}retired_machines${endColour}${yellowColour}: List retired machines${endColour}"
-    echo -e "\t\t${purpleColour}active_linux_machines${endColour}${yellowColour}: List active Linux machines${endColour}"
-    echo -e "\t\t${purpleColour}active_windows_machines${endColour}${yellowColour}: List active Windows machines${endColour}"
-    echo -e "\t\t${purpleColour}active_freebsd_machines${endColour}${yellowColour}: List active FreeBSD machines${endColour}"
-    echo -e "\t\t${purpleColour}active_openbsd_machines${endColour}${yellowColour}: List active OpenBSD machines${endColour}"
-    echo -e "\t\t${purpleColour}active_other_machines${endColour}${yellowColour}: List active Other machines${endColour}"
-    echo -e "\t\t${purpleColour}retired_linux_machines${endColour}${yellowColour}: List retired Linux machines${endColour}"
-    echo -e "\t\t${purpleColour}retired_windows_machines${endColour}${yellowColour}: List retired Windows machines${endColour}"
-    echo -e "\t\t${purpleColour}retired_freebsd_machines${endColour}${yellowColour}: List retired FreeBSD machines${endColour}"
-    echo -e "\t\t${purpleColour}retired_openbsd_machines${endColour}${yellowColour}: List retired OpenBSD machines${endColour}"
-    echo -e "\t\t${purpleColour}retired_other_machines${endColour}${yellowColour}: List retired Other machines${endColour}\n"
+    echo -e "\t\t${purpleColour}all_machines${endColour}${yellowColour}:\t\t\t List all machines${endColour}"
+    echo -e "\t\t${purpleColour}active_machines${endColour}${yellowColour}:\t\t List active machines${endColour}"
+    echo -e "\t\t${purpleColour}retired_machines${endColour}${yellowColour}:\t\t List retired machines${endColour}"
+    echo -e "\t\t${purpleColour}active_linux_machines${endColour}${yellowColour}:\t\t List active Linux machines${endColour}"
+    echo -e "\t\t${purpleColour}active_windows_machines${endColour}${yellowColour}:\t List active Windows machines${endColour}"
+    echo -e "\t\t${purpleColour}active_freebsd_machines${endColour}${yellowColour}:\t List active FreeBSD machines${endColour}"
+    echo -e "\t\t${purpleColour}active_openbsd_machines${endColour}${yellowColour}:\t List active OpenBSD machines${endColour}"
+    echo -e "\t\t${purpleColour}active_other_machines${endColour}${yellowColour}:\t\t List active Other machines${endColour}"
+    echo -e "\t\t${purpleColour}retired_linux_machines${endColour}${yellowColour}:\t\t List retired Linux machines${endColour}"
+    echo -e "\t\t${purpleColour}retired_windows_machines${endColour}${yellowColour}:\t List retired Windows machines${endColour}"
+    echo -e "\t\t${purpleColour}retired_freebsd_machines${endColour}${yellowColour}:\t List retired FreeBSD machines${endColour}"
+    echo -e "\t\t${purpleColour}retired_openbsd_machines${endColour}${yellowColour}:\t List retired OpenBSD machines${endColour}"
+    echo -e "\t\t${purpleColour}retired_other_machines${endColour}${yellowColour}:\t\t List retired Other machines${endColour}\n"
     echo -e "\t${grayColour}[-s]${endColour}${yellowColour} Search by machine name${endColour} ${blueColour}(Example: -s Rope)${endColour}\n"
     echo -e "\t${grayColour}[-i]${endColour}${yellowColour} Search by IP Address${endColour} ${blueColour}(Example: -i 10.10.10.10)${endColour}\n"
     tput cnorm; exit 1
