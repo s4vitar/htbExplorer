@@ -15,11 +15,13 @@ declare -r grayColour="\e[0;37m\033[1m"
 # Global Variables
 declare -r USER_AGENT="User-Agent: htbExplorer"
 declare -r url_machines_get_all="https://hackthebox.eu/api/machines/get/all"
+declare -r url_global_data="https://www.hackthebox.eu/api/stats/global"
 declare -r tmp_file="tmp.json"
 
 trap ctrl_c INT
 
 function ctrl_c(){
+    tput cnorm
     echo -e "\n\n${redColour}[!] Exiting...${endColour}"
     rm getAllMachines 2>/dev/null
     exit 1
@@ -122,11 +124,23 @@ function generateFiles(){
     done
 }
 
+function getGlobalData(){
+
+    echo "Sessions, Active VPNs, Total Machines" > global_data
+    curl -s -X POST $url_global_data | tr "'" '"' | jq '.["data"]["sessions","vpn","machines"]' | xargs | tr ' ' ',' >> global_data
+    echo -ne "${grayColour}"
+    printTable ',' "$(cat global_data)"
+    echo -ne "${endColour}"
+    rm global_data 2>/dev/null
+}
+
 function getAllMachines(){
 
+    getGlobalData
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getAllMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
+
         field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')
         if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
@@ -136,12 +150,15 @@ function getAllMachines(){
         let id+=1
     done
 
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getAllMachines)"
+    echo -e "${endColour}"
     rm getAllMachines 2>/dev/null
 }
 
 function getActiveMachines(){
 
+    getGlobalData
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getActiveMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -157,12 +174,15 @@ function getActiveMachines(){
     sed -i '/Is Active/!d' getActiveMachines
     sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' getActiveMachines
 
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getActiveMachines)"
+    echo -e "${endColour}"
     rm getActiveMachines 2>/dev/null
 }
 
 function getRetiredMachines(){
 
+    getGlobalData
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -177,12 +197,15 @@ function getRetiredMachines(){
 
     sed -i '/Is Active/d' getRetiredMachines
 
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getRetiredMachines)"
+    echo -e "${endColour}"
     rm getRetiredMachines 2>/dev/null
 }
 
 function getActiveLinuxMachines(){
 
+    getGlobalData
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getActiveLinuxMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -203,12 +226,15 @@ function getActiveLinuxMachines(){
     sed -i '/FreeBSD/d' getActiveLinuxMachines
     sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' getActiveLinuxMachines
 
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getActiveLinuxMachines)"
+    echo -e "${endColour}"
     rm getActiveLinuxMachines 2>/dev/null
 }
 
 function getActiveWindowsMachines(){
 
+    getGlobalData
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getActiveWindowsMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -229,12 +255,15 @@ function getActiveWindowsMachines(){
     sed -i '/Solaris/d' getActiveWindowsMachines
     sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' getActiveWindowsMachines
 
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getActiveWindowsMachines)"
+    echo -e "${endColour}"
     rm getActiveWindowsMachines 2>/dev/null
 }
 
 function getActiveFreebsdMachines(){
 
+    getGlobalData
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getActiveFreebsdMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -255,12 +284,15 @@ function getActiveFreebsdMachines(){
     sed -i '/Solaris/d' getActiveFreebsdMachines
     sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' getActiveFreebsdMachines
 
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getActiveFreebsdMachines)"
+    echo -e "${endColour}"
     rm getActiveFreebsdMachines 2>/dev/null
 }
 
 function getActiveOpenbsdMachines(){
 
+    getGlobalData
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getActiveOpenbsdMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -280,13 +312,16 @@ function getActiveOpenbsdMachines(){
     sed -i '/Other/d' getActiveOpenbsdMachines
     sed -i '/Solaris/d' getActiveOpenbsdMachines
     sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' getActiveOpenbsdMachines
-
+    
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getActiveOpenbsdMachines)"
+    echo -e "${endColour}"
     rm getActiveOpenbsdMachines 2>/dev/null
 }
 
 function getActiveOtherMachines(){
 
+    getGlobalData
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getActiveOtherMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -307,12 +342,15 @@ function getActiveOtherMachines(){
     sed -i '/Solaris/d' getActiveOtherMachines
     sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' getActiveOtherMachines
 
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getActiveOtherMachines)"
+    echo -e "${endColour}"
     rm getActiveOtherMachines 2>/dev/null
 }
 
 function getRetiredWindowsMachines(){
 
+    getGlobalData
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredWindowsMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -331,12 +369,16 @@ function getRetiredWindowsMachines(){
     sed -i '/OpenBSD/d' getRetiredWindowsMachines
     sed -i '/Other/d' getRetiredWindowsMachines
     sed -i '/Solaris/d' getRetiredWindowsMachines
+
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getRetiredWindowsMachines)"
+    echo -e "${endColour}"
     rm getRetiredWindowsMachines 2>/dev/null
 }
 
 function getRetiredFreebsdMachines(){
 
+    getGlobalData
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredFreebsdMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -355,12 +397,16 @@ function getRetiredFreebsdMachines(){
     sed -i '/OpenBSD/d' getRetiredFreebsdMachines
     sed -i '/Other/d' getRetiredFreebsdMachines
     sed -i '/Solaris/d' getRetiredFreebsdMachines
+
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getRetiredFreebsdMachines)"
+    echo -e "${endColour}"
     rm getRetiredFreebsdMachines 2>/dev/null
 }
 
 function getRetiredOpenbsdMachines(){
  
+    getGlobalData
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredOpenbsdMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -379,12 +425,16 @@ function getRetiredOpenbsdMachines(){
     sed -i '/FreeBSD/d' getRetiredOpenbsdMachines
     sed -i '/Other/d' getRetiredOpenbsdMachines
     sed -i '/Solaris/d' getRetiredOpenbsdMachines
+
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getRetiredOpenbsdMachines)"
+    echo -e "${endColour}"
     rm getRetiredOpenbsdMachines 2>/dev/null   
 }
 
 function getRetiredLinuxMachines(){
 
+    getGlobalData
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredLinuxMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -403,12 +453,16 @@ function getRetiredLinuxMachines(){
     sed -i '/OpenBSD/d' getRetiredLinuxMachines
     sed -i '/Other/d' getRetiredLinuxMachines
     sed -i '/Solaris/d' getRetiredLinuxMachines
+
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getRetiredLinuxMachines)"
+    echo -ne "${endColour}"
     rm getRetiredLinuxMachines 2>/dev/null
 }
 
 function getRetiredOtherMachines(){
 
+    getGlobalData
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getRetiredOtherMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -427,12 +481,16 @@ function getRetiredOtherMachines(){
 	sed -i '/FreeBSD/d' getRetiredOtherMachines
     sed -i '/OpenBSD/d' getRetiredOtherMachines
     sed -i '/Solaris/d' getRetiredOtherMachines
+
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getRetiredOtherMachines)"
+    echo -e "${endColour}"
     rm getRetiredOtherMachines 2>/dev/null
 }
 
 function searchMachineName(){
 
+    getGlobalData
 	s_machine_name=$1
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> searchMachineName
 
@@ -450,11 +508,12 @@ function searchMachineName(){
 	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' searchMachineName
 
     printTable ',' "$(cat searchMachineName)"
-    rm searchMachineName 2>/dev/null
+    tput cnorm; rm searchMachineName 2>/dev/null
 }
 
 function searchIPAddress(){
 
+    getGlobalData
     ipAddress=$1
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> searchIPAddress
 
@@ -472,7 +531,7 @@ function searchIPAddress(){
 	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' searchIPAddress
 
     printTable ',' "$(cat searchIPAddress)"
-    rm searchIPAddress 2>/dev/null
+    tput cnorm; rm searchIPAddress 2>/dev/null
 }
 
 function helpPanel(){
@@ -497,10 +556,10 @@ function helpPanel(){
     echo -e "\t\t${purpleColour}retired_other_machines${endColour}${yellowColour}: List retired Other machines${endColour}\n"
     echo -e "\t${grayColour}[-s]${endColour}${yellowColour} Search by machine name${endColour} ${blueColour}(Example: -s Rope)${endColour}\n"
     echo -e "\t${grayColour}[-i]${endColour}${yellowColour} Search by IP Address${endColour} ${blueColour}(Example: -i 10.10.10.10)${endColour}\n"
-    exit 1
+    tput cnorm; exit 1
 }
 
-while getopts ":e:t:g:s:i:h:" arg; do
+tput civis; while getopts ":e:t:g:s:i:h:" arg; do
 	case $arg in
 		e) explorer_mode=$OPTARG;;
         t) API_TOKEN=$OPTARG;;
@@ -559,5 +618,5 @@ if [ $explorer_mode ] && [ $API_TOKEN ] && [ $generate_files ]; then
     fi
 else
     helpPanel
-fi
+fi; tput cnorm
 
