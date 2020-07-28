@@ -23,6 +23,28 @@ declare -r tmp_file="tmp.json"
 
 trap ctrl_c INT
 
+function banner(){
+    echo -e "${greenColour}
+                      .
+                   %%%%%%%.                
+               %%%%%%.  %%%%%%.            
+          %%%%%%           *%%%%%%.        
+       %%%%%                   .%%%%%%    
+       %%%%%%%%               %%%%%%%%    
+       %%   %%%%%%%      .%%%%%%%  %%%    
+       %%       #%%%%%%%%%%%#      %%%    ${endColour}${grayColour}htbExplorer - HackTheBox Terminal Client${endColour}${greenColour}
+       %%           %%%%#          %%%    
+       %%            %%%           %%%    
+       %%            %%%           %%%    
+       %%%%%         %%%          %%%%    
+         %%%%%%%     %%%     %%%%%%.       
+             #%%%%%%%%%%%%%%%%%            
+                  %%%%%%%%#
+                      .${endColour}\n"
+    
+    for i in $(seq 1 80); do echo -ne "${redColour}-"; done; echo -ne "${endColour}"
+}
+
 function ctrl_c(){
     tput cnorm
     echo -e "\n\n${redColour}[!] Exiting...${endColour}"
@@ -587,8 +609,10 @@ function shoutBoxMessages(){
 }
 
 function helpPanel(){
-    echo -e "\n${redColour}[!] Usage: ./htbExplorer${endColour}\n"
-    echo -e "\t${grayColour}[-t]${endColour}${yellowColour} API Token${endColour} ${redColour}[Required]${endColour}\n"
+    banner
+    echo -e "\n${redColour}[!] Usage: ./htbExplorer${endColour}"
+    for i in $(seq 1 80); do echo -ne "${redColour}-"; done; echo -ne "${endColour}"
+    echo -e "\n\n\t${grayColour}[-t]${endColour}${yellowColour} API Token${endColour} ${redColour}[Required]${endColour}\n"
     echo -e "\t${grayColour}[-g]${endColour}${yellowColour} Generate Files${endColour}"
     echo -e "\t\t${purpleColour}0${endColour}${yellowColour}: No${endColour}"
     echo -e "\t\t${purpleColour}1${endColour}${yellowColour}: Yes${endColour}\n"
