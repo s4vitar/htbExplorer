@@ -13,7 +13,6 @@ declare -r turquoiseColour="\e[0;36m\033[1m"
 declare -r grayColour="\e[0;37m\033[1m"
 
 # Global Variables
-declare -r API_TOKEN=$1
 declare -r USER_AGENT="User-Agent: htbExplorer"
 declare -r url_machines_get_all="https://hackthebox.eu/api/machines/get/all"
 declare -r tmp_file="tmp.json"
@@ -125,15 +124,15 @@ function generateFiles(){
 
 function getAllMachines(){
 
-    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired" >> getAllMachines
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> getAllMachines
 
-    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat tmp.json | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\"]" | tr -d '"' | xargs | tr ' ' ',')
-        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null" ]; then
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat tmp.json | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
 
-        echo $field_value >> getAllMachines
+        echo $field_value | sed 's/true/Yes/g' | sed 's/false/No/g' | sed 's/null/Is Active/' >> getAllMachines
         let id+=1
     done
 
@@ -141,14 +140,28 @@ function getAllMachines(){
 }
 
 function cleanFiles(){
-    rm machine_names $tmp_file getAllMachines 2>/dev/null
+    rm machine_names getAllMachines $tmp_file 2>/dev/null
 }
 
-if [ ! "$API_TOKEN" ]; then
-	echo -e "\n${redColour}[!]${endColour}${blueColour} Usage: ./htbExplorer <API-TOKEN>${endColour}\n"
-else
-    generateFiles
-    getAllMachines
-    cleanFiles
-fi
+function helpPanel(){
+    echo -e "\n${redColour}[!] Usage: ./htbExplorer${endColour}\n"
+    exit 1
+}
 
+while getopts ":e:t:h:" arg; do
+	case $arg in
+		e) explorer_mode=$OPTARG;;
+        t) API_TOKEN=$OPTARG;;
+		h) helpPanel;;
+	esac
+done
+
+if [ $explorer_mode ] && [ $API_TOKEN ]; then
+    if [ "$(echo $explorer_mode)" == "active_machines" ]; then
+        generateFiles
+        getAllMachines
+        cleanFiles
+    fi
+else
+    helpPanel
+fi
