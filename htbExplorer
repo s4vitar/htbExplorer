@@ -16,6 +16,7 @@ declare -r grayColour="\e[0;37m\033[1m"
 declare -r USER_AGENT="User-Agent: htbExplorer"
 declare -r url_machines_get_all="https://hackthebox.eu/api/machines/get/all"
 declare -r url_global_data="https://www.hackthebox.eu/api/stats/global"
+declare -r url_user_id="https://www.hackthebox.eu/api/user/id"
 declare -r tmp_file="tmp.json"
 
 trap ctrl_c INT
@@ -534,6 +535,22 @@ function searchIPAddress(){
     tput cnorm; rm searchIPAddress 2>/dev/null
 }
 
+function searchUserName(){
+
+    username=$1
+    id_username=$(curl -s -X POST "$url_user_id?api_token=$API_TOKEN" -L --data "username=$username" | tr "'" '"' | sed 's/None/\"None\"/g' | sed 's/True/\"True\"/g' | sed 's/False/\"False\"/g' | jq '.["id"]')
+
+    if [ $id_username ]; then
+        echo "Username,ID,HTB Profile" > searchUserName
+        echo "$username,$id_username,https://www.hackthebox.eu/home/users/profile/$id_username" >> searchUserName
+
+        echo -ne "${yellowColour}"
+        printTable ',' "$(cat searchUserName)"
+        echo -ne "${endColour}"
+        tput cnorm; rm searchUserName 2>/dev/null
+    fi
+}
+
 function helpPanel(){
     echo -e "\n${redColour}[!] Usage: ./htbExplorer${endColour}\n"
     echo -e "\t${grayColour}[-t]${endColour}${yellowColour} API Token${endColour} ${redColour}[Required]${endColour}\n"
@@ -554,18 +571,20 @@ function helpPanel(){
     echo -e "\t\t${purpleColour}retired_freebsd_machines${endColour}${yellowColour}:\t List retired FreeBSD machines${endColour}"
     echo -e "\t\t${purpleColour}retired_openbsd_machines${endColour}${yellowColour}:\t List retired OpenBSD machines${endColour}"
     echo -e "\t\t${purpleColour}retired_other_machines${endColour}${yellowColour}:\t\t List retired Other machines${endColour}\n"
-    echo -e "\t${grayColour}[-s]${endColour}${yellowColour} Search by machine name${endColour} ${blueColour}(Example: -s Rope)${endColour}\n"
-    echo -e "\t${grayColour}[-i]${endColour}${yellowColour} Search by IP Address${endColour} ${blueColour}(Example: -i 10.10.10.10)${endColour}\n"
+    echo -e "\t${grayColour}[-s]${endColour}${yellowColour} Search by machine name${endColour} ${blueColour}\t(Example: -s Rope)${endColour}\n"
+    echo -e "\t${grayColour}[-i]${endColour}${yellowColour} Search by IP Address${endColour} ${blueColour}\t(Example: -i 10.10.10.10)${endColour}\n"
+    echo -e "\t${grayColour}[-f]${endColour}${yellowColour} Search username${endColour} ${blueColour}\t\t(Example: -f s4vitar)${endColour}\n"
     tput cnorm; exit 1
 }
 
-tput civis; while getopts ":e:t:g:s:i:h:" arg; do
+tput civis; while getopts ":e:t:g:s:i:f:h:" arg; do
 	case $arg in
 		e) explorer_mode=$OPTARG;;
         t) API_TOKEN=$OPTARG;;
         g) generate_files=$OPTARG;;
 		s) search_machine_name=$OPTARG;;
         i) ip_address=$OPTARG;;
+        f) user_name=$OPTARG;;
 		h) helpPanel;;
 	esac
 done
@@ -578,13 +597,18 @@ elif [ "$(echo $generate_files)" == "0" ]; then
     fi
 fi
 
-if [ $search_machine_name ]; then
+if [ $search_machine_name ] && [ $API_TOKEN ]; then
 	searchMachineName $search_machine_name
 	exit 0
 fi
 
-if [ $ip_address ]; then
+if [ $ip_address ] && [ $API_TOKEN ]; then
     searchIPAddress $ip_address
+    exit 0
+fi
+
+if [ $user_name ] && [ $API_TOKEN ]; then
+    searchUserName $user_name
     exit 0
 fi
 
