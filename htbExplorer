@@ -226,6 +226,28 @@ function getActiveWindowsMachines(){
     rm getActiveWindowsMachines 2>/dev/null
 }
 
+function searchMachineName(){
+
+	s_machine_name=$1
+    echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab" >> searchMachineName
+
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\"]" | tr -d '"' | xargs | tr ' ' ',')
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null" ]; then
+            break
+        fi
+
+        echo $field_value | sed 's/true/Yes/g' | sed 's/false/No/g' | sed 's/null/Is Active/' >> searchMachineName
+        let id+=1
+    done
+	
+	sed -i "/$s_machine_name/!d" searchMachineName
+	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab' searchMachineName
+
+    printTable ',' "$(cat searchMachineName)"
+    rm searchMachineName 2>/dev/null
+}
+
 function helpPanel(){
     echo -e "\n${redColour}[!] Usage: ./htbExplorer${endColour}\n"
     echo -e "\t${grayColour}[-t]${endColour}${yellowColour} API Token${endColour}\n"
@@ -237,15 +259,17 @@ function helpPanel(){
     echo -e "\t\t${purpleColour}active_machines${endColour}${yellowColour}: List active machines${endColour}"
     echo -e "\t\t${purpleColour}active_linux_machines${endColour}${yellowColour}: List active Linux machines${endColour}"
     echo -e "\t\t${purpleColour}active_windows_machines${endColour}${yellowColour}: List active Windows machines${endColour}"
-    echo -e "\t\t${purpleColour}retired_machines${endColour}${yellowColour}: List retired machines${endColour}"
+    echo -e "\t\t${purpleColour}retired_machines${endColour}${yellowColour}: List retired machines${endColour}\n"
+	echo -e "\t${grayColour}[-s]${endColour}${yellowColour} Search by machine name${endColour}\n"
     exit 1
 }
 
-while getopts ":e:t:g:h:" arg; do
+while getopts ":e:t:g:s:h:" arg; do
 	case $arg in
 		e) explorer_mode=$OPTARG;;
         t) API_TOKEN=$OPTARG;;
         g) generate_files=$OPTARG;;
+		s) search_machine_name=$OPTARG;;
 		h) helpPanel;;
 	esac
 done
@@ -256,6 +280,11 @@ elif [ "$(echo $generate_files)" == "0" ]; then
     if [ ! -f $tmp_file ]; then
         generateFiles
     fi
+fi
+
+if [ $search_machine_name ]; then
+	searchMachineName $search_machine_name
+	exit 0
 fi
 
 if [ $explorer_mode ] && [ $API_TOKEN ] && [ $generate_files ]; then
