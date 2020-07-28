@@ -18,6 +18,7 @@ declare -r url_machines_get_all="https://hackthebox.eu/api/machines/get/all"
 declare -r url_global_data="https://www.hackthebox.eu/api/stats/global"
 declare -r url_user_id="https://www.hackthebox.eu/api/user/id"
 declare -r url_reset_machine="https://www.hackthebox.eu/api/vm/reset/"
+declare -r url_shoutbox_messages="https://www.hackthebox.eu/api/shouts/get/initial/html/"
 declare -r tmp_file="tmp.json"
 
 trap ctrl_c INT
@@ -573,10 +574,18 @@ function resetMachineName(){
     tput cnorm; rm searchMachineName 2>/dev/null
 }
 
+function shoutBoxMessages(){
+    shoutbox_chat_value=$1
+    echo -e "${grayColour}"
+    curl -s -X POST "$url_shoutbox_messages$shoutbox_chat_value?api_token=$API_TOKEN" -L | jq '.["html"]' | tr -d '[]' | html2text | grep ":" | awk '{print $1}' FS="&" | sed 's/\">//' | grep ":" | sed 's/became a/became a VIP/g' | sed 's/(+1/+1/g' | sed 's/01\\//' | sed 's/  / /g'
+
+    echo -ne "${endColour}"; tput cnorm
+}
+
 function helpPanel(){
     echo -e "\n${redColour}[!] Usage: ./htbExplorer${endColour}\n"
     echo -e "\t${grayColour}[-t]${endColour}${yellowColour} API Token${endColour} ${redColour}[Required]${endColour}\n"
-    echo -e "\t${grayColour}[-g]${endColour}${yellowColour} Generate Files${endColour} ${redColour}[Required]${endColour}"
+    echo -e "\t${grayColour}[-g]${endColour}${yellowColour} Generate Files${endColour}"
     echo -e "\t\t${purpleColour}0${endColour}${yellowColour}: No${endColour}"
     echo -e "\t\t${purpleColour}1${endColour}${yellowColour}: Yes${endColour}\n"
     echo -e "\t${grayColour}[-e]${endColour}${yellowColour} Exploration Mode${endColour}"
@@ -593,14 +602,15 @@ function helpPanel(){
     echo -e "\t\t${purpleColour}retired_freebsd_machines${endColour}${yellowColour}:\t List retired FreeBSD machines${endColour}"
     echo -e "\t\t${purpleColour}retired_openbsd_machines${endColour}${yellowColour}:\t List retired OpenBSD machines${endColour}"
     echo -e "\t\t${purpleColour}retired_other_machines${endColour}${yellowColour}:\t\t List retired Other machines${endColour}\n"
-    echo -e "\t${grayColour}[-s]${endColour}${yellowColour} Search by machine name${endColour} ${blueColour}\t(Example: -s Rope)${endColour}\n"
-    echo -e "\t${grayColour}[-i]${endColour}${yellowColour} Search by IP Address${endColour} ${blueColour}\t(Example: -i 10.10.10.10)${endColour}\n"
-    echo -e "\t${grayColour}[-r]${endColour}${yellowColour} Reset a machine${endColour} ${blueColour}\t\t(Example: -r Mantis)${endColour}\n"
-    echo -e "\t${grayColour}[-f]${endColour}${yellowColour} Search username${endColour} ${blueColour}\t\t(Example: -f s4vitar)${endColour}\n"
+    echo -e "\t${grayColour}[-s]${endColour}${yellowColour} Search by machine name${endColour} ${blueColour}\t\t (Example: -s Rope)${endColour}\n"
+    echo -e "\t${grayColour}[-i]${endColour}${yellowColour} Search by IP Address${endColour} ${blueColour}\t\t (Example: -i 10.10.10.10)${endColour}\n"
+    echo -e "\t${grayColour}[-r]${endColour}${yellowColour} Reset a machine${endColour} ${blueColour}\t\t\t (Example: -r Mantis)${endColour}\n"
+    echo -e "\t${grayColour}[-f]${endColour}${yellowColour} Search username${endColour} ${blueColour}\t\t\t (Example: -f s4vitar)${endColour}\n"
+    echo -e "\t${grayColour}[-c]${endColour}${yellowColour} Show latest shoutbox messages${endColour}${blueColour}\t (Example: -c 50)${endColour}\n"
     tput cnorm; exit 1
 }
 
-tput civis; while getopts ":e:t:g:s:i:f:r:h:" arg; do
+tput civis; while getopts ":e:t:g:s:i:f:r:c:h:" arg; do
 	case $arg in
 		e) explorer_mode=$OPTARG;;
         t) API_TOKEN=$OPTARG;;
@@ -609,6 +619,7 @@ tput civis; while getopts ":e:t:g:s:i:f:r:h:" arg; do
         i) ip_address=$OPTARG;;
         f) user_name=$OPTARG;;
         r) reset_machineName=$OPTARG;;
+        c) shoutbox_messages=$OPTARG;;
 		h) helpPanel;;
 	esac
 done
@@ -638,6 +649,11 @@ fi
 
 if [ $reset_machineName ] && [ $API_TOKEN ]; then
     resetMachineName $reset_machineName
+    exit 0
+fi
+
+if [ $shoutbox_messages ]  && [ $API_TOKEN ]; then
+    shoutBoxMessages $shoutbox_messages
     exit 0
 fi
 
