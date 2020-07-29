@@ -59,7 +59,7 @@ function banner(){
 function ctrl_c(){
     tput cnorm
     echo -e "\n\n${redColour}[!] Exiting...${endColour}"
-    rm getAllMachines shout* user* searchUserName 2>/dev/null
+    rm getAllMachines shout* user* searchUserName tmp.json 2>/dev/null
     exit 1
 }
 
@@ -197,7 +197,7 @@ function getActiveMachines(){
     getGlobalData
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
-        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                       
         if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
             break
         fi
@@ -671,7 +671,7 @@ function searchUserName(){
 }
 
 function resetMachineName(){
-    generateFiles
+
     reset_machineName=$1
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -684,7 +684,7 @@ function resetMachineName(){
         let id+=1
     done
 
-    machine_to_reset_id=$(cat searchMachineName | grep $reset_machineName | tr ',' ' ' | awk 'NF{print $NF}')
+    machine_to_reset_id=$(cat searchMachineName | grep "$reset_machineName," | tr ',' ' ' | awk 'NF{print $NF}')
 
     response=$(curl -s -X POST "${url_reset_machine}${machine_to_reset_id}?api_token=$API_TOKEN" -L | jq '.["output"]' | tr -d '"')
 
@@ -746,7 +746,6 @@ function whoisChatting(){
 
 function deployMachine(){
 
-    generateFiles
     deployMachineName=$1
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -759,7 +758,7 @@ function deployMachine(){
         let id+=1
     done
 
-    machine_to_deploy_id=$(cat searchMachineName | grep $deployMachineName | tr ',' ' ' | awk 'NF{print $NF}')
+    machine_to_deploy_id=$(cat searchMachineName | grep "$deployMachineName," | tr ',' ' ' | awk 'NF{print $NF}')
 
     response=$(curl -s -X POST "${url_deploy_machine}${machine_to_deploy_id}?api_token=$API_TOKEN" -L | jq '.["status"]' | tr -d '"')
 
@@ -774,7 +773,6 @@ function deployMachine(){
 
 function stopMachine(){
 
-    generateFiles
     stopMachineName=$1
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -787,9 +785,10 @@ function stopMachine(){
         let id+=1
     done
 
-    machine_to_stop_id=$(cat searchMachineName | grep $stopMachineName | tr ',' ' ' | awk 'NF{print $NF}')
-
+    machine_to_stop_id=$(cat searchMachineName | grep "$stopMachineName," | tr ',' ' ' | awk 'NF{print $NF}')
     response=$(curl -s -X POST "${url_stop_machine}${machine_to_stop_id}?api_token=$API_TOKEN" -L | jq '.["status"]' | tr -d '"')
+
+    curl -s -X POST "${url_stop_machine}${machine_to_stop_id}?api_token=$API_TOKEN" -L | jq
 
     if [ "$(echo $response)" == "null" ]; then
         echo -e "\n${redColour}[!] It was not posible to stop the machine${endColour}\n"
@@ -801,7 +800,7 @@ function stopMachine(){
 }
 
 function extendMachine(){
-    generateFiles
+
     extendMachineName=$1
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -832,10 +831,7 @@ function helpPanel(){
 #    echo; for i in $(seq 1 80); do echo -ne "${redColour}-"; done; echo -ne "${endColour}"
     echo -e "\n${redColour}[!] Usage: ./htbExplorer${endColour}"
     for i in $(seq 1 80); do echo -ne "${redColour}-"; done; echo -ne "${endColour}"
-    echo -e "\n\t${grayColour}[-g]${endColour}${yellowColour} Generate Files${endColour}"
-    echo -e "\t\t${purpleColour}0${endColour}${yellowColour}: No${endColour}"
-    echo -e "\t\t${purpleColour}1${endColour}${yellowColour}: Yes${endColour}\n"
-    echo -e "\t${grayColour}[-e]${endColour}${yellowColour} Exploration Mode${endColour}"
+    echo -e "\n\n\t${grayColour}[-e]${endColour}${yellowColour} Exploration Mode${endColour}"
     echo -e "\t\t${purpleColour}all_machines${endColour}${yellowColour}:\t\t\t List all machines${endColour}"
     echo -e "\t\t${purpleColour}active_machines${endColour}${yellowColour}:\t\t List active machines${endColour}"
     echo -e "\t\t${purpleColour}retired_machines${endColour}${yellowColour}:\t\t List retired machines${endColour}"
@@ -864,77 +860,73 @@ function helpPanel(){
     tput cnorm; exit 1
 }
 
-tput civis; while getopts ":e:g:s:i:f:r:c:w:d:k:x:h:" arg; do
+parameter_counter=0
+tput civis; while getopts ":e:s:i:f:r:c:w:d:k:x:h:" arg; do
 	case $arg in
-		e) explorer_mode=$OPTARG;;
-        g) generate_files=$OPTARG;;
-		s) search_machine_name=$OPTARG;;
-        i) ip_address=$OPTARG;;
-        f) user_name=$OPTARG;;
-        r) reset_machineName=$OPTARG;;
-        c) shoutbox_messages=$OPTARG;;
-        w) whois_messages=$OPTARG;;
-        d) machine_to_deploy=$OPTARG;;
-        k) machine_to_stop=$OPTARG;;
-        x) machine_to_extend=$OPTARG;;
+		e) explorer_mode=$OPTARG && let parameter_counter+=1;;
+		s) search_machine_name=$OPTARG && let parameter_counter+=1;;
+        i) ip_address=$OPTARG && let parameter_counter+=1;;
+        f) user_name=$OPTARG && let parameter_counter+=1;;
+        r) reset_machineName=$OPTARG && let parameter_counter+=1;;
+        c) shoutbox_messages=$OPTARG && let parameter_counter+=1;;
+        w) whois_messages=$OPTARG && let parameter_counter+=1;;
+        d) machine_to_deploy=$OPTARG && let parameter_counter+=1;;
+        k) machine_to_stop=$OPTARG && let parameter_counter+=1;;
+        x) machine_to_extend=$OPTARG && let parameter_counter+=1;;
 		h) helpPanel;;
 	esac
 done
 
-if [ "$(echo $generate_files)" == "1" ]; then
-    generateFiles
-elif [ "$(echo $generate_files)" == "0" ]; then
-    if [ ! -f $tmp_file ]; then
-        generateFiles
-    fi
+if [ "$parameter_counter" != "0" ]; then
+	generateFiles
 fi
 
 if [ $search_machine_name ] && [ $API_TOKEN ]; then
 	searchMachineName $search_machine_name
-	exit 0
+	rm tmp.json 2>/dev/null; exit 0
 fi
 
 if [ $ip_address ] && [ $API_TOKEN ]; then
     searchIPAddress $ip_address
-    exit 0
+    rm tmp.json 2>/dev/null; exit 0
 fi
 
 if [ $user_name ] && [ $API_TOKEN ]; then
     searchUserName $user_name
-    exit 0
+    rm tmp.json 2>/dev/null; exit 0
 fi
 
 if [ $reset_machineName ] && [ $API_TOKEN ]; then
     resetMachineName $reset_machineName
-    exit 0
+    rm tmp.json 2>/dev/null; exit 0
 fi
 
 if [ $machine_to_deploy ] && [ $API_TOKEN ]; then
 	deployMachine $machine_to_deploy
-	exit 0
+	rm tmp.json 2>/dev/null; exit 0
 fi
 
 if [ $machine_to_stop ] && [ $API_TOKEN ]; then
     stopMachine $machine_to_stop
-    exit 0
+    rm tmp.json 2>/dev/null; exit 0
 fi
 
 if [ $machine_to_extend ] && [ $API_TOKEN ]; then
     extendMachine $machine_to_extend
-    exit 0
+    rm tmp.json 2>/dev/null; exit 0
 fi
 
 if [ $shoutbox_messages ]  && [ $API_TOKEN ]; then
     shoutBoxMessages $shoutbox_messages
-    exit 0
+    rm tmp.json 2>/dev/null; exit 0
 fi
 
 if [ $whois_messages ] && [ $API_TOKEN ]; then
 	whoisChatting $whois_messages
-	exit 0
+	rm tmp.json 2>/dev/null; exit 0
 fi
 
-if [ $explorer_mode ] && [ $API_TOKEN ] && [ $generate_files ]; then
+if [ $explorer_mode ] && [ $API_TOKEN ]; then
     if [ "$(echo $explorer_mode)" == "all_machines" ]; then
         getAllMachines
     elif [ "$(echo $explorer_mode)" == "active_machines" ]; then
@@ -970,5 +962,6 @@ if [ $explorer_mode ] && [ $API_TOKEN ] && [ $generate_files ]; then
     fi
 else
     helpPanel
-fi; tput cnorm
+fi
 
+rm tmp.json 2>/dev/null; tput cnorm
