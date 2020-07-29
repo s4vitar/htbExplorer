@@ -646,15 +646,17 @@ function searchUserName(){
     username=$1
     id_username=$(curl -s -X POST "$url_user_id?api_token=$API_TOKEN" -L --data "username=$username" | tr "'" '"' | sed 's/None/\"None\"/g' | sed 's/True/\"True\"/g' | sed 's/False/\"False\"/g' | jq '.["id"]')
 
+	curl -s "https://www.hackthebox.eu/profile/$id_username" | html2text > user_info
+
     if [ $id_username ]; then
-        echo "Username,ID,HTB Profile" > searchUserName
-        echo "$username,$id_username,https://www.hackthebox.eu/home/users/profile/$id_username" >> searchUserName
+        echo "Username,ID,User Owns,System Owns,HallOfFame,Challenges Solved,Respected by,Badges,Rank" > searchUserName
+        echo "$username,$id_username,$(cat user_info | grep "\[image\]" -A 2 | awk 'NR==3' | awk '{print $3}'),$(cat user_info | grep "\[image\]" -A 2 | awk 'NR==3' | awk '{print $2}'),$(cat user_info | grep "is at position" | awk '{print $5}'),$(cat user_info | grep "challenges" | awk '{print $4}'),$(cat user_info | grep "respected by" | awk '{print $5}'),$(cat user_info | grep "badges" | awk '{print $5}'),$(cat user_info | grep "\[image\]" -A 3 | awk 'NR==4')" >> searchUserName
 
         echo -ne "${yellowColour}"
         printTable ',' "$(cat searchUserName)"
         echo -ne "${endColour}"
         tput cnorm; rm searchUserName 2>/dev/null
-    fi
+    fi; rm user_info 2>/dev/null
 }
 
 function resetMachineName(){
