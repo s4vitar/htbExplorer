@@ -714,7 +714,6 @@ function whoisChatting(){
     cat shoutBox.tmp | while read line_in_shoutbox; do
         user=$(echo $line_in_shoutbox | awk '{print $4}')
         echo $user >> users.txt
-        echo -e "${blueColour}[$user]:${endColour}${grayColour} $line_in_shoutbox${endColour}"
     done
 
 	echo "Username,ID,User Owns,System Owns,HallOfFame,Challenges Solved,Respected by,Badges,Rank" > searchUserName
@@ -736,7 +735,9 @@ function whoisChatting(){
 	    fi
 	done
 
+	echo -ne "${yellowColour}"
 	printTable ',' "$(cat searchUserName)"
+	echo -ne "${endColour}"
     rm shoutBox.tmp users.txt user_info searchUserName 2>/dev/null; tput cnorm
 }
 
