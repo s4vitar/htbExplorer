@@ -23,6 +23,7 @@ declare -r url_spawned_machines="https://www.hackthebox.eu/api/machines/spawned"
 declare -r url_owned_machines="https://www.hackthebox.eu/api/machines/owns"
 declare -r url_deploy_machine="https://hackthebox.eu/api/vm/vip/assign/"
 declare -r url_stop_machine="https://hackthebox.eu/api/vm/vip/remove/"
+declare -r url_extend_machine="https://hackthebox.eu/api/vm/vip/extend/"
 declare -r tmp_file="tmp.json"
 declare -r API_TOKEN="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" # <Your API Token goes here>
 
@@ -799,6 +800,33 @@ function stopMachine(){
     tput cnorm; rm searchMachineName 2>/dev/null
 }
 
+function extendMachine(){
+    generateFiles
+    extendMachineName=$1
+
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
+            break
+        fi
+
+        echo $field_value | sed 's/true/Yes/g' | sed 's/false/No/g' | sed 's/null/Is Active/' >> searchMachineName
+        let id+=1
+    done
+
+    machine_to_extend_id=$(cat searchMachineName | grep $extendMachineName | tr ',' ' ' | awk 'NF{print $NF}')
+
+    response=$(curl -s -X POST "${url_extend_machine}${machine_to_extend_id}?api_token=$API_TOKEN" -L | jq '.["status"]' | tr -d '"')
+
+    if [ "$(echo $response)" == "null" ]; then
+        echo -e "\n${redColour}[!] It was not posible to extend the machine time${endColour}\n"
+    else
+        echo -e "\n${yellowColour}[*]${endColour}${grayColour} $response${endColour}\n"
+    fi
+
+    tput cnorm; rm searchMachineName 2>/dev/null
+}
+
 function helpPanel(){
     banner
 #    echo; for i in $(seq 1 80); do echo -ne "${redColour}-"; done; echo -ne "${endColour}"
@@ -827,15 +855,16 @@ function helpPanel(){
     echo -e "\t${grayColour}[-s]${endColour}${yellowColour} Search by machine name${endColour} ${blueColour}\t\t (Example: -s Rope)${endColour}\n"
     echo -e "\t${grayColour}[-i]${endColour}${yellowColour} Search by IP Address${endColour} ${blueColour}\t\t (Example: -i 10.10.10.10)${endColour}\n"
     echo -e "\t${grayColour}[-r]${endColour}${yellowColour} Reset a machine${endColour} ${blueColour}\t\t\t (Example: -r Mantis)${endColour}\n"
-    echo -e "\t${grayColour}[-d]${endColour}${yellowColour} Deploy a machine${endColour} ${blueColour}\t\t\t (Example: -d Aragog)${endColour}\n"
-    echo -e "\t${grayColour}[-k]${endColour}${yellowColour} Stop a machine${endColour} ${blueColour}\t\t\t (Example: -k Hawk)${endColour}\n"
+    echo -e "\t${grayColour}[-d]${endColour}${yellowColour} Deploy a machine${endColour} ${blueColour}\t\t\t (Example: -d Aragog)${endColour}${redColour} [Only for VIP members]${endColour}\n"
+    echo -e "\t${grayColour}[-k]${endColour}${yellowColour} Stop a machine${endColour} ${blueColour}\t\t\t (Example: -k Hawk)${endColour}${redColour} [Only for VIP members]${endColour}\n"
+    echo -e "\t${grayColour}[-x]${endColour}${yellowColour} Extend a machine time${endColour} ${blueColour}\t\t (Example: -x Legacy)${endColour}${redColour} [Only for VIP members]${endColour}\n"
     echo -e "\t${grayColour}[-f]${endColour}${yellowColour} Search username${endColour} ${blueColour}\t\t\t (Example: -f s4vitar)${endColour}\n"
     echo -e "\t${grayColour}[-c]${endColour}${yellowColour} Show latest shoutbox messages${endColour}${blueColour}\t (Example: -c 50)${endColour}\n"
 	echo -e "\t${grayColour}[-w]${endColour}${yellowColour} Who is chatting${endColour}${blueColour}\t\t\t (Example: -w 50)${endColour}\n"
     tput cnorm; exit 1
 }
 
-tput civis; while getopts ":e:g:s:i:f:r:c:w:d:k:h:" arg; do
+tput civis; while getopts ":e:g:s:i:f:r:c:w:d:k:x:h:" arg; do
 	case $arg in
 		e) explorer_mode=$OPTARG;;
         g) generate_files=$OPTARG;;
@@ -847,6 +876,7 @@ tput civis; while getopts ":e:g:s:i:f:r:c:w:d:k:h:" arg; do
         w) whois_messages=$OPTARG;;
         d) machine_to_deploy=$OPTARG;;
         k) machine_to_stop=$OPTARG;;
+        x) machine_to_extend=$OPTARG;;
 		h) helpPanel;;
 	esac
 done
@@ -886,6 +916,11 @@ fi
 
 if [ $machine_to_stop ] && [ $API_TOKEN ]; then
     stopMachine $machine_to_stop
+    exit 0
+fi
+
+if [ $machine_to_extend ] && [ $API_TOKEN ]; then
+    extendMachine $machine_to_extend
     exit 0
 fi
 
