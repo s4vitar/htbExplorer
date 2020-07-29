@@ -20,6 +20,7 @@ declare -r url_user_id="https://www.hackthebox.eu/api/user/id"
 declare -r url_reset_machine="https://www.hackthebox.eu/api/vm/reset/"
 declare -r url_shoutbox_messages="https://www.hackthebox.eu/api/shouts/get/initial/html/"
 declare -r url_spawned_machines="https://www.hackthebox.eu/api/machines/spawned"
+declare -r url_owned_machines="https://www.hackthebox.eu/api/machines/owns"
 declare -r tmp_file="tmp.json"
 declare -r API_TOKEN="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" # <Your API Token goes here>
 
@@ -540,6 +541,60 @@ function getSpawnedMachines(){
     rm getAllMachines getSpawnedMachines 2>/dev/null; tput cnorm
 }
 
+function getOwnedMachines(){
+
+	getGlobalData
+
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
+            break
+        fi
+
+        echo $field_value | sed 's/true/Yes/g' | sed 's/false/No/g' | sed 's/null/Is Active/' >> getAllMachines
+        let id+=1
+    done
+
+	curl -s "$url_owned_machines?api_token=$API_TOKEN" | jq | grep id | awk 'NF{print $NF}' | tr -d ',' | while read owned_id_machine; do
+		cat getAllMachines | grep ",$owned_id_machine$" >> getOwnedMachines
+	done
+
+	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getOwnedMachines
+
+    printTable ',' "$(cat getOwnedMachines)"
+
+    rm getAllMachines getOwnedMachines 2>/dev/null; tput cnorm
+}
+
+function getActiveOwnedMachines(){
+
+    getGlobalData
+
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
+            break
+        fi
+
+        echo $field_value | sed 's/true/Yes/g' | sed 's/false/No/g' | sed 's/null/Is Active/' >> getAllMachines
+        let id+=1
+    done
+
+    curl -s "$url_owned_machines?api_token=$API_TOKEN" | jq | grep id | awk 'NF{print $NF}' | tr -d ',' | while read owned_id_machine; do
+        cat getAllMachines | grep ",$owned_id_machine$" >> getOwnedMachines
+    done
+
+	sed -i '/Is Active/!d' getOwnedMachines
+
+    sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getOwnedMachines
+
+    printTable ',' "$(cat getOwnedMachines)"
+
+    rm getAllMachines getOwnedMachines 2>/dev/null; tput cnorm
+}
+
 function searchMachineName(){
 
     getGlobalData
@@ -663,7 +718,9 @@ function helpPanel(){
     echo -e "\t\t${purpleColour}retired_freebsd_machines${endColour}${yellowColour}:\t List retired FreeBSD machines${endColour}"
     echo -e "\t\t${purpleColour}retired_openbsd_machines${endColour}${yellowColour}:\t List retired OpenBSD machines${endColour}"
     echo -e "\t\t${purpleColour}retired_other_machines${endColour}${yellowColour}:\t\t List retired Other machines${endColour}"
-    echo -e "\t\t${purpleColour}spawned_machines${endColour}${yellowColour}:\t\t List spawned machines${endColour}\n"
+    echo -e "\t\t${purpleColour}spawned_machines${endColour}${yellowColour}:\t\t List spawned machines${endColour}"
+    echo -e "\t\t${purpleColour}owned_machines${endColour}${yellowColour}:\t\t\t List owned machines${endColour}"
+    echo -e "\t\t${purpleColour}owned_active_machines${endColour}${yellowColour}:\t\t List owned active machines${endColour}\n"
     echo -e "\t${grayColour}[-s]${endColour}${yellowColour} Search by machine name${endColour} ${blueColour}\t\t (Example: -s Rope)${endColour}\n"
     echo -e "\t${grayColour}[-i]${endColour}${yellowColour} Search by IP Address${endColour} ${blueColour}\t\t (Example: -i 10.10.10.10)${endColour}\n"
     echo -e "\t${grayColour}[-r]${endColour}${yellowColour} Reset a machine${endColour} ${blueColour}\t\t\t (Example: -r Mantis)${endColour}\n"
@@ -747,6 +804,10 @@ if [ $explorer_mode ] && [ $API_TOKEN ] && [ $generate_files ]; then
         getRetiredOtherMachines
     elif [ "$(echo $explorer_mode)" == "spawned_machines" ]; then
 		getSpawnedMachines
+    elif [ "$(echo $explorer_mode)" == "owned_machines" ]; then
+		getOwnedMachines
+    elif [ "$(echo $explorer_mode)" == "owned_active_machines" ]; then
+		getActiveOwnedMachines
     fi
 else
     helpPanel
