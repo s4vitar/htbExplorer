@@ -20,28 +20,29 @@ declare -r url_user_id="https://www.hackthebox.eu/api/user/id"
 declare -r url_reset_machine="https://www.hackthebox.eu/api/vm/reset/"
 declare -r url_shoutbox_messages="https://www.hackthebox.eu/api/shouts/get/initial/html/"
 declare -r tmp_file="tmp.json"
+declare -r API_TOKEN="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" # <Your API Token goes here>
 
 trap ctrl_c INT
 
 function banner(){
     echo -e "${greenColour}
                       .
-                   %%%%%%%.                
-               %%%%%%.  %%%%%%.            
-          %%%%%%           *%%%%%%.        
-       %%%%%                   .%%%%%%    
-       %%%%%%%%               %%%%%%%%    
-       %%   %%%%%%%      .%%%%%%%  %%%    
+                   %%%%%%%.
+               %%%%%%.  %%%%%%.
+          %%%%%%           *%%%%%%.
+       %%%%%                   .%%%%%%
+       %%%%%%%%               %%%%%%%%
+       %%   %%%%%%%      .%%%%%%%  %%%
        %%       #%%%%%%%%%%%#      %%%    ${endColour}${grayColour}htbExplorer - HackTheBox Terminal Client${endColour}${greenColour}
        %%           %%%%#          %%%    ${endColour}${blueColour}\t\t\t     by S4vitar${endColour}${redColour} <3${endColour}${greenColour}
-       %%            %%%           %%%    
-       %%            %%%           %%%    
-       %%%%%         %%%          %%%%    
-         %%%%%%%     %%%     %%%%%%.       
-             #%%%%%%%%%%%%%%%%%            
+       %%            %%%           %%%
+       %%            %%%           %%%
+       %%%%%         %%%          %%%%
+         %%%%%%%     %%%     %%%%%%.
+             #%%%%%%%%%%%%%%%%%
                   %%%%%%%%#
                       .${endColour}\n"
-    
+
     for i in $(seq 1 80); do echo -ne "${redColour}-"; done; echo -ne "${endColour}"
 }
 
@@ -639,10 +640,9 @@ function helpPanel(){
     tput cnorm; exit 1
 }
 
-tput civis; while getopts ":e:t:g:s:i:f:r:c:h:" arg; do
+tput civis; while getopts ":e:g:s:i:f:r:c:h:" arg; do
 	case $arg in
 		e) explorer_mode=$OPTARG;;
-        t) API_TOKEN=$OPTARG;;
         g) generate_files=$OPTARG;;
 		s) search_machine_name=$OPTARG;;
         i) ip_address=$OPTARG;;
