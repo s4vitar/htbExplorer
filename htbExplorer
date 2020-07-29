@@ -533,15 +533,23 @@ function getSpawnedMachines(){
         let id+=1
     done
 
-	curl -s -X GET "$url_spawned_machines?api_token=$API_TOKEN" | jq | grep id | awk 'NF{print $NF}' | tr -d ',' | while read spawned_id_machine; do
-		cat getAllMachines | grep ",$spawned_id_machine$" >> getSpawnedMachines
-	done
+	spawned_machines_response=$(curl -s -X GET "$url_spawned_machines?api_token=$API_TOKEN" | jq '.["status"]' | tr -d '"')
 
-	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getSpawnedMachines
+	if [ ! "$(echo $spawned_machines_response | grep not)" ]; then
 
-	printTable ',' "$(cat getSpawnedMachines)"
+		curl -s -X GET "$url_spawned_machines?api_token=$API_TOKEN" | jq | grep id | awk 'NF{print $NF}' | tr -d ',' | while read spawned_id_machine; do
+			cat getAllMachines | grep ",$spawned_id_machine$" >> getSpawnedMachines
+		done
 
-    rm getAllMachines getSpawnedMachines 2>/dev/null; tput cnorm
+		sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getSpawnedMachines
+
+		printTable ',' "$(cat getSpawnedMachines)"
+
+	    rm getAllMachines getSpawnedMachines 2>/dev/null; tput cnorm
+	else
+		echo -e "\n${redColour}[!] $spawned_machines_response${endColour}\n"
+		rm getAllMachines 2>/dev/null; tput cnorm
+	fi
 }
 
 function getOwnedMachines(){
