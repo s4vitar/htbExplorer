@@ -24,6 +24,11 @@ declare -r API_TOKEN="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" # <You
 
 trap ctrl_c INT
 
+if [ "$API_TOKEN" == "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" ]; then
+	echo -e "\n${redColour}[!] You have to enter your API TOKEN in the code${endColour}\n"
+	exit 1
+fi
+
 function banner(){
     echo -e "${greenColour}
                       .
@@ -585,13 +590,13 @@ function resetMachineName(){
     done
 
     machine_to_reset_id=$(cat searchMachineName | grep $reset_machineName | tr ',' ' ' | awk 'NF{print $NF}')
-    
+
     response=$(curl -s -X POST "${url_reset_machine}${machine_to_reset_id}?api_token=$API_TOKEN" -L | jq '.["output"]' | tr -d '"')
 
     if [ "$(echo $response)" == "null" ]; then
         echo -e "\n${redColour}[!] It was not posible to restart the machine${endColour}\n"
     else
-        echo -e "\n${grayColour}[*] $response${endColour}\n"
+        echo -e "\n${yellowColour}[*]${endColour}${grayColour} $response${endColour}\n"
     fi
 
     tput cnorm; rm searchMachineName 2>/dev/null
@@ -614,8 +619,7 @@ function helpPanel(){
 #    echo; for i in $(seq 1 80); do echo -ne "${redColour}-"; done; echo -ne "${endColour}"
     echo -e "\n${redColour}[!] Usage: ./htbExplorer${endColour}"
     for i in $(seq 1 80); do echo -ne "${redColour}-"; done; echo -ne "${endColour}"
-    echo -e "\n\n\t${grayColour}[-t]${endColour}${yellowColour} API Token${endColour} ${redColour}[Required]${endColour}\n"
-    echo -e "\t${grayColour}[-g]${endColour}${yellowColour} Generate Files${endColour}"
+    echo -e "\n\t${grayColour}[-g]${endColour}${yellowColour} Generate Files${endColour}"
     echo -e "\t\t${purpleColour}0${endColour}${yellowColour}: No${endColour}"
     echo -e "\t\t${purpleColour}1${endColour}${yellowColour}: Yes${endColour}\n"
     echo -e "\t${grayColour}[-e]${endColour}${yellowColour} Exploration Mode${endColour}"
