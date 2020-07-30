@@ -1,6 +1,6 @@
 # htbExplorer
 
-**htbExplorer** es una herramienta ideal para trabajar cómodamente desde consola sobre la plataforma de HackTheBox.
+**htbExplorer** es un cliente de terminal hecho en Bash ideal para trabajar cómodamente desde consola sobre la plataforma de HackTheBox.
 
 ¿Cómo ejecuto la herramienta?
 ======
