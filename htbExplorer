@@ -24,12 +24,13 @@ declare -r url_owned_machines="https://www.hackthebox.eu/api/machines/owns"
 declare -r url_deploy_machine="https://hackthebox.eu/api/vm/vip/assign/"
 declare -r url_stop_machine="https://hackthebox.eu/api/vm/vip/remove/"
 declare -r url_extend_machine="https://hackthebox.eu/api/vm/vip/extend/"
+declare -r url_assign_machine="https://hackthebox.eu/api/vm/vip/assign/"
 declare -r tmp_file="tmp.json"
-declare -r API_TOKEN="TKK7agmNzEKodGVkCIK2aDSkfXOALKFzFjP7ChAJDPEOumdwwd6RuHlt9nRb" # <Your API Token goes here>
+declare -r API_TOKEN="" # <Your API Token goes here>
 
 trap ctrl_c INT
 
-if [ "$API_TOKEN" == "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" ]; then
+if [ ! "$API_TOKEN" ]; then
 	echo -e "\n${redColour}[!] You have to enter your API TOKEN in the code${endColour}\n"
 	exit 1
 fi
@@ -629,12 +630,19 @@ function searchMachineName(){
     done
 
 	sed -i "/$s_machine_name/!d" searchMachineName
-	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' searchMachineName
 
-	echo -ne "${greenColour}"
-    printTable ',' "$(cat searchMachineName)"
-    echo -ne "${endColour}"
-    tput cnorm; rm searchMachineName 2>/dev/null
+	if [ "$(cat searchMachineName | wc -l)" != "0" ]; then
+		sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' searchMachineName
+
+		echo -ne "${greenColour}"
+	    printTable ',' "$(cat searchMachineName)"
+	    echo -ne "${endColour}"
+	    tput cnorm; rm searchMachineName 2>/dev/null
+	else
+		echo -e "\n${redColour}[!] There is no machine with that name${endColour}\n"
+		rm searchMachineName 2>/dev/null; tput cnorm
+		exit 1
+	fi
 }
 
 function searchIPAddress(){
@@ -653,12 +661,19 @@ function searchIPAddress(){
     done
 
 	sed -i "/$ipAddress,/!d" searchIPAddress
-	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' searchIPAddress
 
-    echo -ne "${greenColour}"
-    printTable ',' "$(cat searchIPAddress)"
-    echo -ne "${endColour}"
-    tput cnorm; rm searchIPAddress 2>/dev/null
+	if [ "$(cat searchIPAddress | wc -l)" != "0" ]; then
+		sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' searchIPAddress
+
+	    echo -ne "${greenColour}"
+	    printTable ',' "$(cat searchIPAddress)"
+	    echo -ne "${endColour}"
+	    tput cnorm; rm searchIPAddress 2>/dev/null
+	else
+		echo -e "\n${redColour}[!] There is no machine with that IP address${endColour}\n"
+		rm searchIPAddress 2>/dev/null; tput cnorm
+		exit 1
+	fi
 }
 
 function searchUserName(){
@@ -682,6 +697,8 @@ function searchUserName(){
 	    fi; rm user_info 2>/dev/null
 	else
 		echo -e "\n${redColour}[!] User has not public profile${endColour}\n"
+		rm searchUserName user_info 2>/dev/null
+		tput cnorm
 	fi
 
 	tput cnorm; rm user_info 2>/dev/null
@@ -721,7 +738,7 @@ function shoutBoxMessages(){
     cat shoutBox.tmp | while read line_in_shoutbox; do
         user=$(echo $line_in_shoutbox | awk '{print $4}')
         echo $user >> users.txt
-        echo -e "${blueColour}[$user]:${endColour}${grayColour} $line_in_shoutbox${endColour}"
+        echo -e "${blueColour}[$user]:${endColour}${grayColour} $line_in_shoutbox${endColour}" | grep -v -E '\[\]|\["\]'
     done
 
     rm shoutBox.tmp users.txt user_info 2>/dev/null; tput cnorm
@@ -841,6 +858,32 @@ function extendMachine(){
     tput cnorm; rm searchMachineName 2>/dev/null
 }
 
+function assignMachine(){
+    assignMachineName=$1
+
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
+            break
+        fi
+
+        echo $field_value | sed 's/true/Yes/g' | sed 's/false/No/g' | sed 's/null/Is Active/' >> searchMachineName
+        let id+=1
+    done
+
+    machine_to_assign_id=$(cat searchMachineName | grep $assignMachineName | tr ',' ' ' | awk 'NF{print $NF}')
+
+    response=$(curl -s -X POST "${url_assign_machine}${machine_to_assign_id}?api_token=$API_TOKEN" -L | jq '.["status"]' | tr -d '"')
+
+    if [ "$(echo $response)" == "null" ]; then
+        echo -e "\n${redColour}[!] It was not posible to assign the machine time${endColour}\n"
+    else
+        echo -e "\n${yellowColour}[*]${endColour}${grayColour} $response${endColour}\n"
+    fi
+
+    tput cnorm; rm searchMachineName 2>/dev/null
+}
+
 function helpPanel(){
     banner
 #    echo; for i in $(seq 1 80); do echo -ne "${redColour}-"; done; echo -ne "${endColour}"
@@ -860,7 +903,7 @@ function helpPanel(){
     echo -e "\t\t${purpleColour}retired_freebsd_machines${endColour}${yellowColour}:\t List retired FreeBSD machines${endColour}"
     echo -e "\t\t${purpleColour}retired_openbsd_machines${endColour}${yellowColour}:\t List retired OpenBSD machines${endColour}"
     echo -e "\t\t${purpleColour}retired_other_machines${endColour}${yellowColour}:\t\t List retired Other machines${endColour}"
-    echo -e "\t\t${purpleColour}spawned_machines${endColour}${yellowColour}:\t\t List spawned machines${endColour}"
+    echo -e "\t\t${purpleColour}spawned_machines${endColour}${yellowColour}:\t\t List spawned machines${endColour}${redColour} [Only for VIP members]${endColour}"
     echo -e "\t\t${purpleColour}owned_machines${endColour}${yellowColour}:\t\t\t List owned machines${endColour}"
     echo -e "\t\t${purpleColour}owned_active_machines${endColour}${yellowColour}:\t\t List owned active machines${endColour}\n"
     echo -e "\t${grayColour}[-s]${endColour}${yellowColour} Search by machine name${endColour} ${blueColour}\t\t (Example: -s Rope)${endColour}\n"
@@ -868,6 +911,7 @@ function helpPanel(){
     echo -e "\t${grayColour}[-r]${endColour}${yellowColour} Reset a machine${endColour} ${blueColour}\t\t\t (Example: -r Mantis)${endColour}\n"
     echo -e "\t${grayColour}[-d]${endColour}${yellowColour} Deploy a machine${endColour} ${blueColour}\t\t\t (Example: -d Aragog)${endColour}${redColour} [Only for VIP members]${endColour}\n"
     echo -e "\t${grayColour}[-k]${endColour}${yellowColour} Stop a machine${endColour} ${blueColour}\t\t\t (Example: -k Hawk)${endColour}${redColour} [Only for VIP members]${endColour}\n"
+    echo -e "\t${grayColour}[-a]${endColour}${yellowColour} Assign a machine${endColour} ${blueColour}\t\t\t (Example: -a Lame)${endColour}${redColour} [Only for VIP members]${endColour}\n"
     echo -e "\t${grayColour}[-x]${endColour}${yellowColour} Extend a machine time${endColour} ${blueColour}\t\t (Example: -x Legacy)${endColour}${redColour} [Only for VIP members]${endColour}\n"
     echo -e "\t${grayColour}[-f]${endColour}${yellowColour} Search username${endColour} ${blueColour}\t\t\t (Example: -f s4vitar)${endColour}\n"
     echo -e "\t${grayColour}[-c]${endColour}${yellowColour} Show latest shoutbox messages${endColour}${blueColour}\t (Example: -c 50)${endColour}\n"
@@ -876,7 +920,7 @@ function helpPanel(){
 }
 
 parameter_counter=0
-tput civis; while getopts ":e:s:i:f:r:c:w:d:k:x:h:" arg; do
+tput civis; while getopts ":e:s:i:f:r:c:w:d:k:x:a:h:" arg; do
 	case $arg in
 		e) explorer_mode=$OPTARG && let parameter_counter+=1;;
 		s) search_machine_name=$OPTARG && let parameter_counter+=1;;
@@ -888,6 +932,7 @@ tput civis; while getopts ":e:s:i:f:r:c:w:d:k:x:h:" arg; do
         d) machine_to_deploy=$OPTARG && let parameter_counter+=1;;
         k) machine_to_stop=$OPTARG && let parameter_counter+=1;;
         x) machine_to_extend=$OPTARG && let parameter_counter+=1;;
+        a) machine_to_assign=$OPTARG && let parameter_counter+=1;;
 		h) helpPanel;;
 	esac
 done
@@ -929,6 +974,11 @@ fi
 if [ $machine_to_extend ] && [ $API_TOKEN ]; then
     extendMachine $machine_to_extend
     rm tmp.json 2>/dev/null; exit 0
+fi
+
+if [ $machine_to_assign ] && [ $API_TOKEN ];  then
+	assignMachine $machine_to_assign
+	rm tmp.json 2>/dev/null; exit 0
 fi
 
 if [ $shoutbox_messages ]  && [ $API_TOKEN ]; then
