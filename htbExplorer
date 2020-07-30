@@ -25,7 +25,7 @@ declare -r url_deploy_machine="https://hackthebox.eu/api/vm/vip/assign/"
 declare -r url_stop_machine="https://hackthebox.eu/api/vm/vip/remove/"
 declare -r url_extend_machine="https://hackthebox.eu/api/vm/vip/extend/"
 declare -r tmp_file="tmp.json"
-declare -r API_TOKEN="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" # <Your API Token goes here>
+declare -r API_TOKEN="TKK7agmNzEKodGVkCIK2aDSkfXOALKFzFjP7ChAJDPEOumdwwd6RuHlt9nRb" # <Your API Token goes here>
 
 trap ctrl_c INT
 
@@ -533,9 +533,9 @@ function getSpawnedMachines(){
         let id+=1
     done
 
-	spawned_machines_response=$(curl -s -X GET "$url_spawned_machines?api_token=$API_TOKEN" | jq '.["status"]' | tr -d '"')
+	spawned_machines_response=$(curl -s -X GET "$url_spawned_machines?api_token=$API_TOKEN" | jq | grep "status")
 
-	if [ ! "$(echo $spawned_machines_response | grep not)" ]; then
+	if [ "$(echo $?)" != "0" ]; then
 
 		curl -s -X GET "$url_spawned_machines?api_token=$API_TOKEN" | jq | grep id | awk 'NF{print $NF}' | tr -d ',' | while read spawned_id_machine; do
 			cat getAllMachines | grep ",$spawned_id_machine$" >> getSpawnedMachines
@@ -543,10 +543,13 @@ function getSpawnedMachines(){
 
 		sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getSpawnedMachines
 
+		echo -ne "${greenColour}"
 		printTable ',' "$(cat getSpawnedMachines)"
+		echo -ne "${endColour}"
 
 	    rm getAllMachines getSpawnedMachines 2>/dev/null; tput cnorm
 	else
+		spawned_machines_response=$(curl -s -X GET "$url_spawned_machines?api_token=$API_TOKEN" | jq '.["status"]' | tr -d '"')
 		echo -e "\n${redColour}[!] $spawned_machines_response${endColour}\n"
 		rm getAllMachines 2>/dev/null; tput cnorm
 	fi
@@ -573,7 +576,9 @@ function getOwnedMachines(){
 
 	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getOwnedMachines
 
+	echo -ne "${greenColour}"
     printTable ',' "$(cat getOwnedMachines)"
+    echo -ne "${endColour}"
 
     rm getAllMachines getOwnedMachines 2>/dev/null; tput cnorm
 }
@@ -601,7 +606,9 @@ function getActiveOwnedMachines(){
 
     sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getOwnedMachines
 
+	echo -ne "${greenColour}"
     printTable ',' "$(cat getOwnedMachines)"
+    echo -ne "${endColour}"
 
     rm getAllMachines getOwnedMachines 2>/dev/null; tput cnorm
 }
@@ -624,7 +631,9 @@ function searchMachineName(){
 	sed -i "/$s_machine_name/!d" searchMachineName
 	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' searchMachineName
 
+	echo -ne "${greenColour}"
     printTable ',' "$(cat searchMachineName)"
+    echo -ne "${endColour}"
     tput cnorm; rm searchMachineName 2>/dev/null
 }
 
@@ -648,7 +657,7 @@ function searchIPAddress(){
 
     echo -ne "${greenColour}"
     printTable ',' "$(cat searchIPAddress)"
-    echo -e "${endColour}"
+    echo -ne "${endColour}"
     tput cnorm; rm searchIPAddress 2>/dev/null
 }
 
@@ -729,7 +738,7 @@ function whoisChatting(){
 
 	echo "Username,ID,User Owns,System Owns,HallOfFame,Challenges Solved,Respected by,Badges,Rank" > searchUserName
 
-	cat users.txt | while read username; do
+	cat users.txt | sort -u | while read username; do
 	    id_username=$(curl -s -X POST "$url_user_id?api_token=$API_TOKEN" -L --data "username=$username" | tr "'" '"' | sed 's/None/\"None\"/g' | sed 's/True/\"True\"/g' | sed 's/False/\"False\"/g' | jq '.["id"]')
 
 	    curl -s "https://www.hackthebox.eu/profile/$id_username" | html2text > user_info
@@ -795,8 +804,6 @@ function stopMachine(){
 
     machine_to_stop_id=$(cat searchMachineName | grep "$stopMachineName," | tr ',' ' ' | awk 'NF{print $NF}')
     response=$(curl -s -X POST "${url_stop_machine}${machine_to_stop_id}?api_token=$API_TOKEN" -L | jq '.["status"]' | tr -d '"')
-
-    curl -s -X POST "${url_stop_machine}${machine_to_stop_id}?api_token=$API_TOKEN" -L | jq
 
     if [ "$(echo $response)" == "null" ]; then
         echo -e "\n${redColour}[!] It was not posible to stop the machine${endColour}\n"
