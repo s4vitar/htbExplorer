@@ -2,7 +2,7 @@
 
 **htbExplorer** es una herramienta ideal para trabajar cómodamente desde consola sobre la plataforma de HackTheBox.
 
-¿Cómo funciona?
+¿Cómo ejecuto la herramienta?
 ======
 Para empezar, tras ejecutar la herramienta, veremos lo siguiente:
 
@@ -46,3 +46,26 @@ El cual cuenta con múltiples opciones:
         style="float: left; margin-right: 10px;" />
 </p>
 
+Para hacer uso del modo de exploración, a travésd el parámetro '**-e**' podremos indicar el modo de exploración que queremos realizar. Por ejemplo, para listar las máquinas activas:
+
+<p align="center">
+<img src="Images/6.png"
+        alt="6"
+        style="float: left; margin-right: 10px;" />
+</p>
+
+O por el contrario, para listar las máquinas spawneadas:
+
+<p align="center">
+<img src="Images/7.png"
+        alt="7"
+        style="float: left; margin-right: 10px;" />
+</p>
+
+La utilidad **htbExplorer** cuenta con un buscador de máquinas por palabras clave, de forma que en todo momento podemos extraer la información más relevante de una máquina, aún sin saber su nombre entero:
+
+<p align="center">
+<img src="Images/8.png"
+        alt="8"
+        style="float: left; margin-right: 10px;" />
+</p>
