@@ -136,9 +136,17 @@ Dado que solo podemos extender el tiempo en aquella máquina de la cual seamos p
         style="float: left; margin-right: 10px;" />
 </p>
 
+En caso de querer descargarte la VPN, ya no es necesario abrir el navegador. A través del parámetro '**-v**', podrás descargar tu VPN cómodamente indicando para ello un nombre de exportación:
+
+<p align="center">
+<img src="Images/17.png"
+	alt="17"
+    style="float: left; margin-right: 10px;" />
+</p>
+                                
+
 TODO
 ======
 * Poder hacer submit de una flag desde htbExplorer
-* Descargar la VPN cómodamente desde htbExplorer, no siendo necesario abrir el navegador
 * Indicar si eres propietario de alguna máquina, obteniendo el nombre de esta
 

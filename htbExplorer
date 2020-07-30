@@ -884,6 +884,13 @@ function assignMachine(){
     tput cnorm; rm searchMachineName 2>/dev/null
 }
 
+function downloadVPN(){
+	tput cnorm
+	echo -e "\n${yellowColour}[*]${endColour}${grayColour} You need to login first...${endColour}\n"
+	python downloadVPN.py $1
+	echo -e "\n${greenColour}[V]${endColour}${grayColour} The VPN has been download successfuly${endColour}"
+}
+
 function helpPanel(){
     banner
 #    echo; for i in $(seq 1 80); do echo -ne "${redColour}-"; done; echo -ne "${endColour}"
@@ -916,11 +923,12 @@ function helpPanel(){
     echo -e "\t${grayColour}[-f]${endColour}${yellowColour} Search username${endColour} ${blueColour}\t\t\t (Example: -f s4vitar)${endColour}\n"
     echo -e "\t${grayColour}[-c]${endColour}${yellowColour} Show latest shoutbox messages${endColour}${blueColour}\t (Example: -c 50)${endColour}\n"
 	echo -e "\t${grayColour}[-w]${endColour}${yellowColour} Who is chatting${endColour}${blueColour}\t\t\t (Example: -w 50)${endColour}\n"
+	echo -e "\t${grayColour}[-v]${endColour}${yellowColour} Download VPN${endColour}${blueColour}\t\t\t (Example: -v s4vitar.ovpn)${endColour}\n"
     tput cnorm; exit 1
 }
 
 parameter_counter=0
-tput civis; while getopts ":e:s:i:f:r:c:w:d:k:x:a:h:" arg; do
+tput civis; while getopts ":e:s:i:f:r:c:w:d:k:x:a:v:h:" arg; do
 	case $arg in
 		e) explorer_mode=$OPTARG && let parameter_counter+=1;;
 		s) search_machine_name=$OPTARG && let parameter_counter+=1;;
@@ -933,6 +941,7 @@ tput civis; while getopts ":e:s:i:f:r:c:w:d:k:x:a:h:" arg; do
         k) machine_to_stop=$OPTARG && let parameter_counter+=1;;
         x) machine_to_extend=$OPTARG && let parameter_counter+=1;;
         a) machine_to_assign=$OPTARG && let parameter_counter+=1;;
+        v) download_vpn=$OPTARG;;
 		h) helpPanel;;
 	esac
 done
@@ -989,6 +998,11 @@ fi
 if [ $whois_messages ] && [ $API_TOKEN ]; then
 	whoisChatting $whois_messages
 	rm tmp.json 2>/dev/null; exit 0
+fi
+
+if [ $download_vpn ]; then
+	downloadVPN $download_vpn
+	exit 0
 fi
 
 if [ $explorer_mode ] && [ $API_TOKEN ]; then
