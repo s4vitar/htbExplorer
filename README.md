@@ -38,7 +38,7 @@ Una vez introducida, podremos ejecutar la aplicación. Tras su ejecución, verem
         style="float: left; margin-right: 10px;" />
 </p>
 
-El cual cuenta con múltiples opciones:
+La utilidad **htbExplorer** cuenta con múltiples opciones:
 
 <p align="center">
 <img src="Images/fifth.png"
@@ -46,7 +46,9 @@ El cual cuenta con múltiples opciones:
         style="float: left; margin-right: 10px;" />
 </p>
 
-Para hacer uso del modo de exploración, a travésd el parámetro '**-e**' podremos indicar el modo de exploración que queremos realizar. Por ejemplo, para listar las máquinas activas:
+Una de ellas, es el modo de exploración. Para hacer uso de este modo, a través del parámetro '**-e**', podemos indicar el modo de exploración que queremos realizar. 
+
+Por ejemplo, para listar las máquinas activas, haríamos '**-e active_machines**', obteniendo los siguientes resultados:
 
 <p align="center">
 <img src="Images/6.png"
@@ -54,7 +56,7 @@ Para hacer uso del modo de exploración, a travésd el parámetro '**-e**' podre
         style="float: left; margin-right: 10px;" />
 </p>
 
-O por el contrario, para listar las máquinas spawneadas:
+O por el contrario, para listar las máquinas spawneadas, haríamos '**-e spawned_machines**', entre los otros 14 modos de exploración (Es bastante sencillo de usar):
 
 <p align="center">
 <img src="Images/7.png"
@@ -69,3 +71,52 @@ La utilidad **htbExplorer** cuenta con un buscador de máquinas por palabras cla
         alt="8"
         style="float: left; margin-right: 10px;" />
 </p>
+
+De igual manera, podemos encontrar las máquinas proporcionando la dirección IP de estas:
+
+<p align="center">
+<img src="Images/9.png"
+        alt="9"
+        style="float: left; margin-right: 10px;" />
+</p>
+
+A través del parámetro '**-r**', tenemos la capacidad de reiniciar una máquina en base al nombre de máquina que especifiquemos:
+
+<p align="center">
+<img src="Images/10.png"
+        alt="10"
+        style="float: left; margin-right: 10px;" />
+</p>
+
+Asimismo, es posible desplegar una nueva máquina del LAB (siempre y cuando seas VIP), haciendo uso para ello del parámetro '**-d**':
+
+<p align="center">
+<img src="Images/11.png"
+        alt="11"
+        style="float: left; margin-right: 10px;" />
+</p>
+
+En caso de querer extender el tiempo de una máquina, o parar aquella máquina que hayamos desplegado, se puede hacer uso de los parámetros '**-x**' y '**-k**' respectivamente:
+
+<p align="center">
+<img src="Images/12.png"
+        alt="12"
+        style="float: left; margin-right: 10px;" />
+</p>
+
+Dado que solo podemos extender el tiempo en aquella máquina de la cual seamos propietarios, para asignarte como propietario de una máquina, puedes hacer uso del parámetro '**-a**'. De esta forma, posteriormente, podrás extender su tiempo de vida a 24 horas:
+
+<p align="center">
+<img src="Images/13.png"
+        alt="13"
+        style="float: left; margin-right: 10px;" />
+</p>
+
+**htbExplorer** cuenta con un buscador de usuarios, representando la información más relevante de estos en tablas:
+
+<p align="center">
+<img src="Images/14.png"
+        alt="14"
+        style="float: left; margin-right: 10px;" />
+</p>
+
