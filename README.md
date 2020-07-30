@@ -56,7 +56,7 @@ Por ejemplo, para listar las máquinas activas, haríamos '**-e active_machines*
         style="float: left; margin-right: 10px;" />
 </p>
 
-O por el contrario, para listar las máquinas spawneadas, haríamos '**-e spawned_machines**', entre los otros 14 modos de exploración (Es bastante sencillo de usar):
+O por el contrario, para listar las máquinas spawneadas, haríamos '**-e spawned_machines**', entre los otros 14 modos de exploración (es bastante intuitivo y sencillo de usar):
 
 <p align="center">
 <img src="Images/7.png"
@@ -80,7 +80,7 @@ De igual manera, podemos encontrar las máquinas proporcionando la dirección IP
         style="float: left; margin-right: 10px;" />
 </p>
 
-A través del parámetro '**-r**', tenemos la capacidad de reiniciar una máquina en base al nombre de máquina que especifiquemos:
+A través del parámetro '**-r**', tenemos la capacidad de reiniciar una máquina en base al nombre de máquina que especifiquemos, debiendo esperar 1 minuto para poder reiniciar otra:
 
 <p align="center">
 <img src="Images/10.png"
@@ -119,4 +119,26 @@ Dado que solo podemos extender el tiempo en aquella máquina de la cual seamos p
         alt="14"
         style="float: left; margin-right: 10px;" />
 </p>
+
+¿Quieres saber lo que se está hablando en el ShoutBox?, a través del parámetro '**-c**', puedes indicar el número de mensajes a cargar, pudiendo así ver toda la actividad:
+
+<p align="center">
+<img src="Images/15.png"
+        alt="15"
+        style="float: left; margin-right: 10px;" />
+</p>
+
+¿Eres un curioso y te gustaría saber quiénes están hablando?, no te preocupes, con el parámetro '**-w**', podrás representar la información más relevante de aquellos usuarios que estén hablando generando actividad siempre y cuando tengan el perfil público. También es necesario indicar el número de mensajes a cargar:
+
+<p align="center">
+<img src="Images/16.png"
+        alt="16"
+        style="float: left; margin-right: 10px;" />
+</p>
+
+TODO
+======
+* Poder hacer submit de una flag desde htbExplorer
+* Descargar la VPN cómodamente desde htbExplorer, no siendo necesario abrir el navegador
+* Indicar si eres propietario de alguna máquina, obteniendo el nombre de esta
 
