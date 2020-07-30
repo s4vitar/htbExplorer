@@ -80,7 +80,7 @@ De igual manera, podemos encontrar las máquinas proporcionando la dirección IP
         style="float: left; margin-right: 10px;" />
 </p>
 
-A través del parámetro '**-r**', tenemos la capacidad de reiniciar una máquina en base al nombre de máquina que especifiquemos, debiendo esperar 1 minuto para poder reiniciar otra:
+A través del parámetro '**-r**', tenemos la capacidad de reiniciar una máquina en base al nombre de máquina que especifiquemos, debiendo esperar 1 minuto para poder reiniciar otra de las activas:
 
 <p align="center">
 <img src="Images/10.png"
@@ -128,7 +128,7 @@ Dado que solo podemos extender el tiempo en aquella máquina de la cual seamos p
         style="float: left; margin-right: 10px;" />
 </p>
 
-¿Eres un curioso y te gustaría saber quiénes están hablando?, no te preocupes, con el parámetro '**-w**', podrás representar la información más relevante de aquellos usuarios que estén hablando generando actividad siempre y cuando tengan el perfil público. También es necesario indicar el número de mensajes a cargar:
+¿Eres un curioso y te gustaría saber quiénes están hablando?, no te preocupes, con el parámetro '**-w**', podrás representar la información más relevante de aquellos usuarios que estén hablando o generando actividad (siempre y cuando tengan el perfil público). También es necesario indicar el número de mensajes a cargar:
 
 <p align="center">
 <img src="Images/16.png"
