@@ -8,11 +8,11 @@ import requests, re, getpass, urllib3, sys
 main_url="https://www.hackthebox.eu/login"
 download_vpn_url="http://www.hackthebox.eu/home/htb/access/ovpnfile"
 
-filename = sys.argv[1]
-
 if len(sys.argv) != 2:
 	print "\n[!] An error has ocurred\n"
 	sys.exit(1)
+
+filename = sys.argv[1]
 
 if __name__ == '__main__':
 

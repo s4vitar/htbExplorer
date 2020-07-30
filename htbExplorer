@@ -282,8 +282,8 @@ function getActiveWindowsMachines(){
     done
 
     sed -i '/Is Active/!d' getActiveWindowsMachines
-	sed -i '/Linux/d' getActiveWindowsMachines
-	sed -i '/FreeBSD/d' getActiveWindowsMachines
+    sed -i '/Linux/d' getActiveWindowsMachines
+    sed -i '/FreeBSD/d' getActiveWindowsMachines
     sed -i '/OpenBSD/d' getActiveWindowsMachines
     sed -i '/Other/d' getActiveWindowsMachines
     sed -i '/Solaris/d' getActiveWindowsMachines
@@ -310,7 +310,7 @@ function getActiveFreebsdMachines(){
     done
 
     sed -i '/Is Active/!d' getActiveFreebsdMachines
-	sed -i '/Linux/d' getActiveFreebsdMachines
+    sed -i '/Linux/d' getActiveFreebsdMachines
     sed -i '/Windows/d' getActiveFreebsdMachines
     sed -i '/OpenBSD/d' getActiveFreebsdMachines
     sed -i '/Other/d' getActiveFreebsdMachines
@@ -338,7 +338,7 @@ function getActiveOpenbsdMachines(){
     done
 
     sed -i '/Is Active/!d' getActiveOpenbsdMachines
-	sed -i '/Linux/d' getActiveOpenbsdMachines
+    sed -i '/Linux/d' getActiveOpenbsdMachines
     sed -i '/Windows/d' getActiveOpenbsdMachines
     sed -i '/FreeBSD/d' getActiveOpenbsdMachines
     sed -i '/Other/d' getActiveOpenbsdMachines
@@ -366,7 +366,7 @@ function getActiveOtherMachines(){
     done
 
     sed -i '/Is Active/!d' getActiveOtherMachines
-	sed -i '/Linux/d' getActiveOtherMachines
+    sed -i '/Linux/d' getActiveOtherMachines
     sed -i '/Windows/d' getActiveOtherMachines
     sed -i '/FreeBSD/d' getActiveOtherMachines
     sed -i '/OpenBSD/d' getActiveOtherMachines
@@ -395,8 +395,8 @@ function getRetiredWindowsMachines(){
     done
 
     sed -i '/Is Active/d' getRetiredWindowsMachines
-	sed -i '/Linux/d' getRetiredWindowsMachines
-	sed -i '/FreeBSD/d' getRetiredWindowsMachines
+    sed -i '/Linux/d' getRetiredWindowsMachines
+    sed -i '/FreeBSD/d' getRetiredWindowsMachines
     sed -i '/OpenBSD/d' getRetiredWindowsMachines
     sed -i '/Other/d' getRetiredWindowsMachines
     sed -i '/Solaris/d' getRetiredWindowsMachines
@@ -423,7 +423,7 @@ function getRetiredFreebsdMachines(){
     done
 
     sed -i '/Is Active/d' getRetiredFreebsdMachines
-	sed -i '/Linux/d' getRetiredFreebsdMachines
+    sed -i '/Linux/d' getRetiredFreebsdMachines
     sed -i '/Windows/d' getRetiredFreebsdMachines
     sed -i '/OpenBSD/d' getRetiredFreebsdMachines
     sed -i '/Other/d' getRetiredFreebsdMachines
@@ -436,7 +436,7 @@ function getRetiredFreebsdMachines(){
 }
 
 function getRetiredOpenbsdMachines(){
- 
+
     getGlobalData
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getRetiredOpenbsdMachines
 
@@ -451,7 +451,7 @@ function getRetiredOpenbsdMachines(){
     done
 
     sed -i '/Is Active/d' getRetiredOpenbsdMachines
-	sed -i '/Linux/d' getRetiredOpenbsdMachines
+    sed -i '/Linux/d' getRetiredOpenbsdMachines
     sed -i '/Windows/d' getRetiredOpenbsdMachines
     sed -i '/FreeBSD/d' getRetiredOpenbsdMachines
     sed -i '/Other/d' getRetiredOpenbsdMachines
@@ -479,8 +479,8 @@ function getRetiredLinuxMachines(){
     done
 
     sed -i '/Is Active/d' getRetiredLinuxMachines
-	sed -i '/Windows/d' getRetiredLinuxMachines
-	sed -i '/FreeBSD/d' getRetiredLinuxMachines
+    sed -i '/Windows/d' getRetiredLinuxMachines
+    sed -i '/FreeBSD/d' getRetiredLinuxMachines
     sed -i '/OpenBSD/d' getRetiredLinuxMachines
     sed -i '/Other/d' getRetiredLinuxMachines
     sed -i '/Solaris/d' getRetiredLinuxMachines
@@ -507,9 +507,9 @@ function getRetiredOtherMachines(){
     done
 
     sed -i '/Is Active/d' getRetiredOtherMachines
-	sed -i '/Windows/d' getRetiredOtherMachines
+    sed -i '/Windows/d' getRetiredOtherMachines
     sed -i '/Linux/d' getRetiredOtherMachines
-	sed -i '/FreeBSD/d' getRetiredOtherMachines
+    sed -i '/FreeBSD/d' getRetiredOtherMachines
     sed -i '/OpenBSD/d' getRetiredOtherMachines
     sed -i '/Solaris/d' getRetiredOtherMachines
 
@@ -521,7 +521,7 @@ function getRetiredOtherMachines(){
 
 function getSpawnedMachines(){
 
-	getGlobalData
+    getGlobalData
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
 
@@ -534,31 +534,31 @@ function getSpawnedMachines(){
         let id+=1
     done
 
-	spawned_machines_response=$(curl -s -X GET "$url_spawned_machines?api_token=$API_TOKEN" | jq | grep "status")
+    spawned_machines_response=$(curl -s -X GET "$url_spawned_machines?api_token=$API_TOKEN" | jq | grep "status")
 
-	if [ "$(echo $?)" != "0" ]; then
+    if [ "$(echo $?)" != "0" ]; then
 
-		curl -s -X GET "$url_spawned_machines?api_token=$API_TOKEN" | jq | grep id | awk 'NF{print $NF}' | tr -d ',' | while read spawned_id_machine; do
-			cat getAllMachines | grep ",$spawned_id_machine$" >> getSpawnedMachines
-		done
+	curl -s -X GET "$url_spawned_machines?api_token=$API_TOKEN" | jq | grep id | awk 'NF{print $NF}' | tr -d ',' | while read spawned_id_machine; do
+		cat getAllMachines | grep ",$spawned_id_machine$" >> getSpawnedMachines
+	done
 
-		sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getSpawnedMachines
+	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getSpawnedMachines
 
-		echo -ne "${greenColour}"
-		printTable ',' "$(cat getSpawnedMachines)"
-		echo -ne "${endColour}"
+	echo -ne "${greenColour}"
+	printTable ',' "$(cat getSpawnedMachines)"
+	echo -ne "${endColour}"
 
-	    rm getAllMachines getSpawnedMachines 2>/dev/null; tput cnorm
-	else
-		spawned_machines_response=$(curl -s -X GET "$url_spawned_machines?api_token=$API_TOKEN" | jq '.["status"]' | tr -d '"')
-		echo -e "\n${redColour}[!] $spawned_machines_response${endColour}\n"
-		rm getAllMachines 2>/dev/null; tput cnorm
-	fi
+	rm getAllMachines getSpawnedMachines 2>/dev/null; tput cnorm
+    else
+	spawned_machines_response=$(curl -s -X GET "$url_spawned_machines?api_token=$API_TOKEN" | jq '.["status"]' | tr -d '"')
+	echo -e "\n${redColour}[!] $spawned_machines_response${endColour}\n"
+	rm getAllMachines 2>/dev/null; tput cnorm
+    fi
 }
 
 function getOwnedMachines(){
 
-	getGlobalData
+    getGlobalData
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
 
@@ -571,13 +571,13 @@ function getOwnedMachines(){
         let id+=1
     done
 
-	curl -s "$url_owned_machines?api_token=$API_TOKEN" | jq | grep id | awk 'NF{print $NF}' | tr -d ',' | while read owned_id_machine; do
-		cat getAllMachines | grep ",$owned_id_machine$" >> getOwnedMachines
-	done
+    curl -s "$url_owned_machines?api_token=$API_TOKEN" | jq | grep id | awk 'NF{print $NF}' | tr -d ',' | while read owned_id_machine; do
+	cat getAllMachines | grep ",$owned_id_machine$" >> getOwnedMachines
+    done
 
-	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getOwnedMachines
+    sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getOwnedMachines
 
-	echo -ne "${greenColour}"
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getOwnedMachines)"
     echo -ne "${endColour}"
 
@@ -603,11 +603,11 @@ function getActiveOwnedMachines(){
         cat getAllMachines | grep ",$owned_id_machine$" >> getOwnedMachines
     done
 
-	sed -i '/Is Active/!d' getOwnedMachines
+    sed -i '/Is Active/!d' getOwnedMachines
 
     sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' getOwnedMachines
 
-	echo -ne "${greenColour}"
+    echo -ne "${greenColour}"
     printTable ',' "$(cat getOwnedMachines)"
     echo -ne "${endColour}"
 
@@ -617,7 +617,7 @@ function getActiveOwnedMachines(){
 function searchMachineName(){
 
     getGlobalData
-	s_machine_name=$1
+    s_machine_name=$1
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
         field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')
@@ -629,20 +629,20 @@ function searchMachineName(){
         let id+=1
     done
 
-	sed -i "/$s_machine_name/!d" searchMachineName
+    sed -i "/$s_machine_name/!d" searchMachineName
 
-	if [ "$(cat searchMachineName | wc -l)" != "0" ]; then
-		sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' searchMachineName
+    if [ "$(cat searchMachineName | wc -l)" != "0" ]; then
+	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' searchMachineName
 
-		echo -ne "${greenColour}"
-	    printTable ',' "$(cat searchMachineName)"
-	    echo -ne "${endColour}"
-	    tput cnorm; rm searchMachineName 2>/dev/null
-	else
-		echo -e "\n${redColour}[!] There is no machine with that name${endColour}\n"
-		rm searchMachineName 2>/dev/null; tput cnorm
-		exit 1
-	fi
+	echo -ne "${greenColour}"
+        printTable ',' "$(cat searchMachineName)"
+        echo -ne "${endColour}"
+        tput cnorm; rm searchMachineName 2>/dev/null
+    else
+	echo -e "\n${redColour}[!] There is no machine with that name${endColour}\n"
+	rm searchMachineName 2>/dev/null; tput cnorm
+	exit 1
+    fi
 }
 
 function searchIPAddress(){
@@ -660,20 +660,20 @@ function searchIPAddress(){
         let id+=1
     done
 
-	sed -i "/$ipAddress,/!d" searchIPAddress
+    sed -i "/$ipAddress,/!d" searchIPAddress
 
-	if [ "$(cat searchIPAddress | wc -l)" != "0" ]; then
-		sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' searchIPAddress
+    if [ "$(cat searchIPAddress | wc -l)" != "0" ]; then
+	sed -i '1 i\Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID' searchIPAddress
 
-	    echo -ne "${greenColour}"
-	    printTable ',' "$(cat searchIPAddress)"
-	    echo -ne "${endColour}"
-	    tput cnorm; rm searchIPAddress 2>/dev/null
-	else
-		echo -e "\n${redColour}[!] There is no machine with that IP address${endColour}\n"
-		rm searchIPAddress 2>/dev/null; tput cnorm
-		exit 1
-	fi
+        echo -ne "${greenColour}"
+        printTable ',' "$(cat searchIPAddress)"
+        echo -ne "${endColour}"
+        tput cnorm; rm searchIPAddress 2>/dev/null
+    else
+	echo -e "\n${redColour}[!] There is no machine with that IP address${endColour}\n"
+	rm searchIPAddress 2>/dev/null; tput cnorm
+	exit 1
+    fi
 }
 
 function searchUserName(){
@@ -681,27 +681,27 @@ function searchUserName(){
     username=$1
     id_username=$(curl -s -X POST "$url_user_id?api_token=$API_TOKEN" -L --data "username=$username" | tr "'" '"' | sed 's/None/\"None\"/g' | sed 's/True/\"True\"/g' | sed 's/False/\"False\"/g' | jq '.["id"]')
 
-	curl -s "https://www.hackthebox.eu/profile/$id_username" | html2text > user_info
+    curl -s "https://www.hackthebox.eu/profile/$id_username" | html2text > user_info
 
-	little_check=$(cat user_info | grep "\[image\]" -A 2 | awk 'NR==3' | awk '{print $3}')
+    little_check=$(cat user_info | grep "\[image\]" -A 2 | awk 'NR==3' | awk '{print $3}')
 
-	if [ $little_check ]; then
-	    if [ $id_username ]; then
-	        echo "Username,ID,User Owns,System Owns,HallOfFame,Challenges Solved,Respected by,Badges,Rank" > searchUserName
-	        echo "$username,$id_username,$(cat user_info | grep "\[image\]" -A 2 | awk 'NR==3' | awk '{print $3}'),$(cat user_info | grep "\[image\]" -A 2 | awk 'NR==3' | awk '{print $2}'),$(cat user_info | grep "is at position" | awk '{print $5}'),$(cat user_info | grep "challenges" | awk '{print $4}'),$(cat user_info | grep "respected by" | awk '{print $5}'),$(cat user_info | grep "badges" | awk '{print $5}'),$(cat user_info | grep "\[image\]" -A 3 | awk 'NR==4')" >> searchUserName
+    if [ $little_check ]; then
+        if [ $id_username ]; then
+            echo "Username,ID,User Owns,System Owns,HallOfFame,Challenges Solved,Respected by,Badges,Rank" > searchUserName
+            echo "$username,$id_username,$(cat user_info | grep "\[image\]" -A 2 | awk 'NR==3' | awk '{print $3}'),$(cat user_info | grep "\[image\]" -A 2 | awk 'NR==3' | awk '{print $2}'),$(cat user_info | grep "is at position" | awk '{print $5}'),$(cat user_info | grep "challenges" | awk '{print $4}'),$(cat user_info | grep "respected by" | awk '{print $5}'),$(cat user_info | grep "badges" | awk '{print $5}'),$(cat user_info | grep "\[image\]" -A 3 | awk 'NR==4')" >> searchUserName
 
-	        echo -ne "${yellowColour}"
-	        printTable ',' "$(cat searchUserName)"
-	        echo -ne "${endColour}"
-	        tput cnorm; rm searchUserName 2>/dev/null
-	    fi; rm user_info 2>/dev/null
-	else
-		echo -e "\n${redColour}[!] User has not public profile${endColour}\n"
-		rm searchUserName user_info 2>/dev/null
-		tput cnorm
-	fi
+            echo -ne "${yellowColour}"
+            printTable ',' "$(cat searchUserName)"
+            echo -ne "${endColour}"
+            tput cnorm; rm searchUserName 2>/dev/null
+        fi; rm user_info 2>/dev/null
+    else
+	echo -e "\n${redColour}[!] User has not public profile${endColour}\n"
+	rm searchUserName user_info 2>/dev/null
+	tput cnorm
+    fi
 
-	tput cnorm; rm user_info 2>/dev/null
+    tput cnorm; rm user_info 2>/dev/null
 }
 
 function resetMachineName(){
@@ -753,28 +753,28 @@ function whoisChatting(){
         echo $user >> users.txt
     done
 
-	echo "Username,ID,User Owns,System Owns,HallOfFame,Challenges Solved,Respected by,Badges,Rank" > searchUserName
+    echo "Username,ID,User Owns,System Owns,HallOfFame,Challenges Solved,Respected by,Badges,Rank" > searchUserName
 
-	cat users.txt | sort -u | while read username; do
-	    id_username=$(curl -s -X POST "$url_user_id?api_token=$API_TOKEN" -L --data "username=$username" | tr "'" '"' | sed 's/None/\"None\"/g' | sed 's/True/\"True\"/g' | sed 's/False/\"False\"/g' | jq '.["id"]')
+    cat users.txt | sort -u | while read username; do
+        id_username=$(curl -s -X POST "$url_user_id?api_token=$API_TOKEN" -L --data "username=$username" | tr "'" '"' | sed 's/None/\"None\"/g' | sed 's/True/\"True\"/g' | sed 's/False/\"False\"/g' | jq '.["id"]')
 
-	    curl -s "https://www.hackthebox.eu/profile/$id_username" | html2text > user_info
+	curl -s "https://www.hackthebox.eu/profile/$id_username" | html2text > user_info
 
-	    little_check=$(cat user_info | grep "\[image\]" -A 2 | awk 'NR==3' | awk '{print $3}')
+        little_check=$(cat user_info | grep "\[image\]" -A 2 | awk 'NR==3' | awk '{print $3}')
 
-	    if [ $little_check ]; then
-	        if [ $id_username ]; then
-	            echo "$username,$id_username,$(cat user_info | grep "\[image\]" -A 2 | awk 'NR==3' | awk '{print $3}'),$(cat user_info | grep "\[image\]" -A 2 | awk 'NR==3' | awk '{print $2}'),$(cat user_info | grep "is at position" | awk '{print $5}'),$(cat user_info | grep "challenges" | awk '{print $4}'),$(cat user_info | grep "respected by" | awk '{print $5}'),$(cat user_info | grep "badges" | awk '{print $5}'),$(cat user_info | grep "\[image\]" -A 3 | awk 'NR==4')" >> searchUserName
-	            echo -ne "${yellowColour}"
-	            echo -ne "${endColour}"
-	            tput cnorm;
-	        fi; rm user_info 2>/dev/null
-	    fi
-	done
+        if [ $little_check ]; then
+            if [ $id_username ]; then
+                echo "$username,$id_username,$(cat user_info | grep "\[image\]" -A 2 | awk 'NR==3' | awk '{print $3}'),$(cat user_info | grep "\[image\]" -A 2 | awk 'NR==3' | awk '{print $2}'),$(cat user_info | grep "is at position" | awk '{print $5}'),$(cat user_info | grep "challenges" | awk '{print $4}'),$(cat user_info | grep "respected by" | awk '{print $5}'),$(cat user_info | grep "badges" | awk '{print $5}'),$(cat user_info | grep "\[image\]" -A 3 | awk 'NR==4')" >> searchUserName
+                echo -ne "${yellowColour}"
+                echo -ne "${endColour}"
+                tput cnorm;
+            fi; rm user_info 2>/dev/null
+        fi
+    done
 
-	echo -ne "${yellowColour}"
-	printTable ',' "$(cat searchUserName)"
-	echo -ne "${endColour}"
+    echo -ne "${yellowColour}"
+    printTable ',' "$(cat searchUserName)"
+    echo -ne "${endColour}"
     rm shoutBox.tmp users.txt user_info searchUserName 2>/dev/null; tput cnorm
 }
 
@@ -885,15 +885,14 @@ function assignMachine(){
 }
 
 function downloadVPN(){
-	tput cnorm
-	echo -e "\n${yellowColour}[*]${endColour}${grayColour} You need to login first...${endColour}\n"
-	python downloadVPN.py $1
-	echo -e "\n${greenColour}[V]${endColour}${grayColour} The VPN has been download successfuly${endColour}"
+    tput cnorm
+    echo -e "\n${yellowColour}[*]${endColour}${grayColour} You need to login first...${endColour}\n"
+    python downloadVPN.py $1
+    echo -e "\n${greenColour}[V]${endColour}${grayColour} The VPN has been download successfuly${endColour}"
 }
 
 function helpPanel(){
     banner
-#    echo; for i in $(seq 1 80); do echo -ne "${redColour}-"; done; echo -ne "${endColour}"
     echo -e "\n${redColour}[!] Usage: ./htbExplorer${endColour}"
     for i in $(seq 1 80); do echo -ne "${redColour}-"; done; echo -ne "${endColour}"
     echo -e "\n\n\t${grayColour}[-e]${endColour}${yellowColour} Exploration Mode${endColour}"
@@ -922,16 +921,16 @@ function helpPanel(){
     echo -e "\t${grayColour}[-x]${endColour}${yellowColour} Extend a machine time${endColour} ${blueColour}\t\t (Example: -x Legacy)${endColour}${redColour} [Only for VIP members]${endColour}\n"
     echo -e "\t${grayColour}[-f]${endColour}${yellowColour} Search username${endColour} ${blueColour}\t\t\t (Example: -f s4vitar)${endColour}\n"
     echo -e "\t${grayColour}[-c]${endColour}${yellowColour} Show latest shoutbox messages${endColour}${blueColour}\t (Example: -c 50)${endColour}\n"
-	echo -e "\t${grayColour}[-w]${endColour}${yellowColour} Who is chatting${endColour}${blueColour}\t\t\t (Example: -w 50)${endColour}\n"
-	echo -e "\t${grayColour}[-v]${endColour}${yellowColour} Download VPN${endColour}${blueColour}\t\t\t (Example: -v s4vitar.ovpn)${endColour}\n"
+    echo -e "\t${grayColour}[-w]${endColour}${yellowColour} Who is chatting${endColour}${blueColour}\t\t\t (Example: -w 50)${endColour}\n"
+    echo -e "\t${grayColour}[-v]${endColour}${yellowColour} Download VPN${endColour}${blueColour}\t\t\t (Example: -v s4vitar.ovpn)${endColour}\n"
     tput cnorm; exit 1
 }
 
 parameter_counter=0
 tput civis; while getopts ":e:s:i:f:r:c:w:d:k:x:a:v:h:" arg; do
-	case $arg in
-		e) explorer_mode=$OPTARG && let parameter_counter+=1;;
-		s) search_machine_name=$OPTARG && let parameter_counter+=1;;
+    case $arg in
+	e) explorer_mode=$OPTARG && let parameter_counter+=1;;
+	s) search_machine_name=$OPTARG && let parameter_counter+=1;;
         i) ip_address=$OPTARG && let parameter_counter+=1;;
         f) user_name=$OPTARG && let parameter_counter+=1;;
         r) reset_machineName=$OPTARG && let parameter_counter+=1;;
@@ -942,17 +941,17 @@ tput civis; while getopts ":e:s:i:f:r:c:w:d:k:x:a:v:h:" arg; do
         x) machine_to_extend=$OPTARG && let parameter_counter+=1;;
         a) machine_to_assign=$OPTARG && let parameter_counter+=1;;
         v) download_vpn=$OPTARG;;
-		h) helpPanel;;
-	esac
+	h) helpPanel;;
+    esac
 done
 
 if [ "$parameter_counter" != "0" ]; then
-	generateFiles
+    generateFiles
 fi
 
 if [ $search_machine_name ] && [ $API_TOKEN ]; then
-	searchMachineName $search_machine_name
-	rm tmp.json 2>/dev/null; exit 0
+    searchMachineName $search_machine_name
+    rm tmp.json 2>/dev/null; exit 0
 fi
 
 if [ $ip_address ] && [ $API_TOKEN ]; then
@@ -971,8 +970,8 @@ if [ $reset_machineName ] && [ $API_TOKEN ]; then
 fi
 
 if [ $machine_to_deploy ] && [ $API_TOKEN ]; then
-	deployMachine $machine_to_deploy
-	rm tmp.json 2>/dev/null; exit 0
+    deployMachine $machine_to_deploy
+    rm tmp.json 2>/dev/null; exit 0
 fi
 
 if [ $machine_to_stop ] && [ $API_TOKEN ]; then
@@ -986,8 +985,8 @@ if [ $machine_to_extend ] && [ $API_TOKEN ]; then
 fi
 
 if [ $machine_to_assign ] && [ $API_TOKEN ];  then
-	assignMachine $machine_to_assign
-	rm tmp.json 2>/dev/null; exit 0
+    assignMachine $machine_to_assign
+    rm tmp.json 2>/dev/null; exit 0
 fi
 
 if [ $shoutbox_messages ]  && [ $API_TOKEN ]; then
@@ -996,13 +995,13 @@ if [ $shoutbox_messages ]  && [ $API_TOKEN ]; then
 fi
 
 if [ $whois_messages ] && [ $API_TOKEN ]; then
-	whoisChatting $whois_messages
-	rm tmp.json 2>/dev/null; exit 0
+    whoisChatting $whois_messages
+    rm tmp.json 2>/dev/null; exit 0
 fi
 
 if [ $download_vpn ]; then
-	downloadVPN $download_vpn
-	exit 0
+    downloadVPN $download_vpn
+    exit 0
 fi
 
 if [ $explorer_mode ] && [ $API_TOKEN ]; then
@@ -1013,13 +1012,13 @@ if [ $explorer_mode ] && [ $API_TOKEN ]; then
     elif [ "$(echo $explorer_mode)" == "retired_machines" ]; then
         getRetiredMachines
     elif [ "$(echo $explorer_mode)" == "active_linux_machines" ]; then
-		getActiveLinuxMachines
-	elif [ "$(echo $explorer_mode)" == "active_windows_machines" ]; then
-		getActiveWindowsMachines
-	elif [ "$(echo $explorer_mode)" == "retired_linux_machines" ]; then
-		getRetiredLinuxMachines
-	elif [ "$(echo $explorer_mode)" == "retired_windows_machines" ]; then
-		getRetiredWindowsMachines
+	getActiveLinuxMachines
+    elif [ "$(echo $explorer_mode)" == "active_windows_machines" ]; then
+        getActiveWindowsMachines
+    elif [ "$(echo $explorer_mode)" == "retired_linux_machines" ]; then
+	getRetiredLinuxMachines
+    elif [ "$(echo $explorer_mode)" == "retired_windows_machines" ]; then
+	getRetiredWindowsMachines
     elif [ "$(echo $explorer_mode)" == "active_freebsd_machines" ]; then
         getActiveFreebsdMachines
     elif [ "$(echo $explorer_mode)" == "retired_freebsd_machines" ]; then
@@ -1033,11 +1032,11 @@ if [ $explorer_mode ] && [ $API_TOKEN ]; then
     elif [ "$(echo $explorer_mode)" == "retired_other_machines" ]; then
         getRetiredOtherMachines
     elif [ "$(echo $explorer_mode)" == "spawned_machines" ]; then
-		getSpawnedMachines
+	getSpawnedMachines
     elif [ "$(echo $explorer_mode)" == "owned_machines" ]; then
-		getOwnedMachines
+	getOwnedMachines
     elif [ "$(echo $explorer_mode)" == "owned_active_machines" ]; then
-		getActiveOwnedMachines
+	getActiveOwnedMachines
     fi
 else
     helpPanel
