@@ -891,6 +891,25 @@ function downloadVPN(){
     echo -e "\n${greenColour}[V]${endColour}${grayColour} The VPN has been download successfuly${endColour}"
 }
 
+function dependencies(){
+	tput civis; counter=0
+	dependencies_array=(html2text jq)
+
+	echo; for program in "${dependencies_array[@]}"; do
+		if [ ! "$(command -v $program)" ]; then
+			echo -e "${redColour}[X]${endColour}${grayColour} $program${endColour}${yellowColour} is not installed${endColour}"; sleep 1
+			echo -e "\n${yellowColour}[i]${endColour}${grayColour} Installing...${endColour}"; sleep 1
+			apt install $program -y > /dev/null 2>&1
+			echo -e "\n${greenColour}[V]${endColour}${grayColour} $program${endColour}${yellowColour} installed${endColour}\n"; sleep 2
+			let counter+=1
+		fi
+	done
+
+	if [ "$(echo $counter)" == "1" ]; then
+		sleep
+	fi
+}
+
 function helpPanel(){
     banner
     echo -e "\n${redColour}[!] Usage: ./htbExplorer${endColour}"
@@ -926,7 +945,7 @@ function helpPanel(){
     tput cnorm; exit 1
 }
 
-parameter_counter=0
+dependencies; parameter_counter=0
 tput civis; while getopts ":e:s:i:f:r:c:w:d:k:x:a:v:h:" arg; do
     case $arg in
 	e) explorer_mode=$OPTARG && let parameter_counter+=1;;
