@@ -892,6 +892,36 @@ function downloadVPN(){
 }
 
 function dependencies(){
+
+## Detect base OS for better package management. Can't use "$OSTYPE" by default,
+## it returns linux-gnu for different Linuxes. Fine for Fruitbook Computers...
+if [ -f /etc/os-release ]; then
+  OS_RELEASE=$(awk -F= '/^NAME/{print $2}' /etc/os-release | sed 's/"//g')
+else
+  OS_RELEASE=echo "$OSTYPE"
+fi
+
+## Based on what we find, select the appropriate package manager
+echo -e "\n${yellowColour}[*]${endColour}${grayColour} Please provide sudo credentials to install html2text and jq packages...${endColour}\n"
+if [ "$OS_RELEASE" == "Ubuntu" ]; then
+  sudo apt -yinstall html2text jq
+elif [ "$OS_RELEASE" == "Debian GNU/Linux" ]; then
+  sudo apt -yinstall html2text jq
+elif [ "$OS_RELEASE" == "Raspbian GNU/Linux" ]; then
+  sudo apt -yinstall html2text jq
+elif [ "$OS_RELEASE" == "Parrot GNU/Linux" ]; then
+  sudo apt -yinstall html2text jq
+elif [ "$OS_RELEASE" == "CentOS Linux" ]; then
+  sudo yum -y install html2text jq
+elif [[ "$OS_RELEASE" =~ "darwin" ]]; then
+  ## TODO: Check brew is installed on Fruitbook
+  brew install html2text jq
+else
+  ## Unknown OS type, bail out!
+  echo -e "${redColour}[X]${endColour}${grayColour} ${yellowColour} Unknown OS type. Exiting on safety grounds....${endColour}"
+  exit 0
+fi
+
 	tput civis; counter=0
 	dependencies_array=(html2text jq)
 
@@ -899,7 +929,7 @@ function dependencies(){
 		if [ ! "$(command -v $program)" ]; then
 			echo -e "${redColour}[X]${endColour}${grayColour} $program${endColour}${yellowColour} is not installed${endColour}"; sleep 1
 			echo -e "\n${yellowColour}[i]${endColour}${grayColour} Installing...${endColour}"; sleep 1
-			apt install $program -y > /dev/null 2>&1
+
 			echo -e "\n${greenColour}[V]${endColour}${grayColour} $program${endColour}${yellowColour} installed${endColour}\n"; sleep 2
 			let counter+=1
 		fi
