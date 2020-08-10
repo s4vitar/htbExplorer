@@ -254,7 +254,7 @@ function getActiveLinuxMachines(){
     done
 
     sed -i '/Is Active/!d' getActiveLinuxMachines
-	sed -i '/Windows/d' getActiveLinuxMachines
+    sed -i '/Windows/d' getActiveLinuxMachines
     sed -i '/Other/d' getActiveLinuxMachines
     sed -i '/Solaris/d' getActiveLinuxMachines
     sed -i '/OpenBSD/d' getActiveLinuxMachines
@@ -893,51 +893,38 @@ function downloadVPN(){
 
 function dependencies(){
 
-## Detect base OS for better package management. Can't use "$OSTYPE" by default,
-## it returns linux-gnu for different Linuxes. Fine for Fruitbook Computers...
-if [ -f /etc/os-release ]; then
-  OS_RELEASE=$(awk -F= '/^NAME/{print $2}' /etc/os-release | sed 's/"//g')
-else
-  OS_RELEASE=echo "$OSTYPE"
-fi
-
-## Based on what we find, select the appropriate package manager
-echo -e "\n${yellowColour}[*]${endColour}${grayColour} Please provide sudo credentials to install html2text and jq packages...${endColour}\n"
-if [ "$OS_RELEASE" == "Ubuntu" ]; then
-  sudo apt -yinstall html2text jq
-elif [ "$OS_RELEASE" == "Debian GNU/Linux" ]; then
-  sudo apt -yinstall html2text jq
-elif [ "$OS_RELEASE" == "Raspbian GNU/Linux" ]; then
-  sudo apt -yinstall html2text jq
-elif [ "$OS_RELEASE" == "Parrot GNU/Linux" ]; then
-  sudo apt -yinstall html2text jq
-elif [ "$OS_RELEASE" == "CentOS Linux" ]; then
-  sudo yum -y install html2text jq
-elif [[ "$OS_RELEASE" =~ "darwin" ]]; then
-  ## TODO: Check brew is installed on Fruitbook
-  brew install html2text jq
-else
-  ## Unknown OS type, bail out!
-  echo -e "${redColour}[X]${endColour}${grayColour} ${yellowColour} Unknown OS type. Exiting on safety grounds....${endColour}"
-  exit 0
-fi
-
-	tput civis; counter=0
-	dependencies_array=(html2text jq)
-
-	echo; for program in "${dependencies_array[@]}"; do
-		if [ ! "$(command -v $program)" ]; then
-			echo -e "${redColour}[X]${endColour}${grayColour} $program${endColour}${yellowColour} is not installed${endColour}"; sleep 1
-			echo -e "\n${yellowColour}[i]${endColour}${grayColour} Installing...${endColour}"; sleep 1
-
-			echo -e "\n${greenColour}[V]${endColour}${grayColour} $program${endColour}${yellowColour} installed${endColour}\n"; sleep 2
-			let counter+=1
-		fi
-	done
-
-	if [ "$(echo $counter)" == "1" ]; then
-		sleep
+	## Detect base OS for better package management. Can't use "$OSTYPE" by default,
+	## it returns linux-gnu for different Linuxes. Fine for Fruitbook Computers...
+	if [ -f /etc/os-release ]; then
+		OS_RELEASE=$(awk -F= '/^NAME/{print $2}' /etc/os-release | sed 's/"//g')
+	else
+		OS_RELEASE=echo "$OSTYPE"
 	fi
+
+	## Based on what we find, select the appropriate package manager
+	if [ "$(echo $UID)" == "0" ]; then
+
+		tput civis
+		dependencies_array=(html2text jq)
+
+		echo; for program in "${dependencies_array[@]}"; do
+			if [ ! "$(command -v $program)" ]; then
+				echo -e "${redColour}[X]${endColour}${grayColour} $program${endColour}${yellowColour} is not installed${endColour}"; sleep 1
+				echo -e "\n${yellowColour}[i]${endColour}${grayColour} Installing...${endColour}"; sleep 1
+
+				apt install $program -y > /dev/null 2>&1
+
+				echo -e "\n${greenColour}[V]${endColour}${grayColour} $program${endColour}${yellowColour} installed${endColour}\n"; sleep 2
+			fi
+		done
+	else
+		echo -e "\n${redColour}[!] You need to run the program as root${endColour}\n"
+		exit 1
+	fi
+
+#		if [ "$(echo $counter)" == "1" ]; then
+#			sleep
+#		fi
 }
 
 function helpPanel(){
@@ -1061,13 +1048,13 @@ if [ $explorer_mode ] && [ $API_TOKEN ]; then
     elif [ "$(echo $explorer_mode)" == "retired_machines" ]; then
         getRetiredMachines
     elif [ "$(echo $explorer_mode)" == "active_linux_machines" ]; then
-	getActiveLinuxMachines
+		getActiveLinuxMachines
     elif [ "$(echo $explorer_mode)" == "active_windows_machines" ]; then
         getActiveWindowsMachines
     elif [ "$(echo $explorer_mode)" == "retired_linux_machines" ]; then
-	getRetiredLinuxMachines
+		getRetiredLinuxMachines
     elif [ "$(echo $explorer_mode)" == "retired_windows_machines" ]; then
-	getRetiredWindowsMachines
+		getRetiredWindowsMachines
     elif [ "$(echo $explorer_mode)" == "active_freebsd_machines" ]; then
         getActiveFreebsdMachines
     elif [ "$(echo $explorer_mode)" == "retired_freebsd_machines" ]; then
@@ -1081,11 +1068,11 @@ if [ $explorer_mode ] && [ $API_TOKEN ]; then
     elif [ "$(echo $explorer_mode)" == "retired_other_machines" ]; then
         getRetiredOtherMachines
     elif [ "$(echo $explorer_mode)" == "spawned_machines" ]; then
-	getSpawnedMachines
+		getSpawnedMachines
     elif [ "$(echo $explorer_mode)" == "owned_machines" ]; then
-	getOwnedMachines
+		getOwnedMachines
     elif [ "$(echo $explorer_mode)" == "owned_active_machines" ]; then
-	getActiveOwnedMachines
+		getActiveOwnedMachines
     fi
 else
     helpPanel
