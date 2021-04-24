@@ -15,7 +15,6 @@ declare -r grayColour="\e[0;37m\033[1m"
 # Global Variables
 declare -r USER_AGENT="User-Agent: htbExplorer"
 declare -r url_machines_get_all="https://hackthebox.eu/api/machines/get/all"
-declare -r url_global_data="https://www.hackthebox.eu/api/stats/global"
 declare -r url_user_id="https://www.hackthebox.eu/api/user/id"
 declare -r url_reset_machine="https://www.hackthebox.eu/api/vm/reset/"
 declare -r url_shoutbox_messages="https://www.hackthebox.eu/api/shouts/get/initial/html/"
@@ -60,7 +59,7 @@ function banner(){
 function ctrl_c(){
     tput cnorm
     echo -e "\n\n${redColour}[!] Exiting...${endColour}"
-    rm getAllMachines shout* user* searchUserName tmp.json 2>/dev/null
+    rm getAllMachines shout* user* searchUserName searchMachineName tmp.json 2>/dev/null
     exit 1
 }
 
@@ -161,19 +160,9 @@ function generateFiles(){
     done
 }
 
-function getGlobalData(){
+getAllMachines(){
 
-    echo "Sessions, Active VPNs, Total Machines" > global_data
-    curl -s -X POST $url_global_data | tr "'" '"' | jq '.["data"]["sessions","vpn","machines"]' | xargs | tr ' ' ',' >> global_data
-    echo -ne "${grayColour}"
-    printTable ',' "$(cat global_data)"
-    echo -ne "${endColour}"
-    rm global_data 2>/dev/null
-}
-
-function getAllMachines(){
-
-    getGlobalData
+    
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getAllMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -195,7 +184,7 @@ function getAllMachines(){
 
 function getActiveMachines(){
 
-    getGlobalData
+    
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
         field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                       
@@ -218,7 +207,7 @@ function getActiveMachines(){
 
 function getRetiredMachines(){
 
-    getGlobalData
+    
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getRetiredMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -241,7 +230,7 @@ function getRetiredMachines(){
 
 function getActiveLinuxMachines(){
 
-    getGlobalData
+    
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
         field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
@@ -269,7 +258,7 @@ function getActiveLinuxMachines(){
 
 function getActiveWindowsMachines(){
 
-    getGlobalData
+    
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
         field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
@@ -297,7 +286,7 @@ function getActiveWindowsMachines(){
 
 function getActiveFreebsdMachines(){
 
-    getGlobalData
+    
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
         field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
@@ -325,7 +314,7 @@ function getActiveFreebsdMachines(){
 
 function getActiveOpenbsdMachines(){
 
-    getGlobalData
+    
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
         field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
@@ -353,7 +342,7 @@ function getActiveOpenbsdMachines(){
 
 function getActiveOtherMachines(){
 
-    getGlobalData
+    
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
         field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')                                                                                                                                                                        
@@ -381,7 +370,7 @@ function getActiveOtherMachines(){
 
 function getRetiredWindowsMachines(){
 
-    getGlobalData
+    
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getRetiredWindowsMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -409,7 +398,7 @@ function getRetiredWindowsMachines(){
 
 function getRetiredFreebsdMachines(){
 
-    getGlobalData
+    
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getRetiredFreebsdMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -437,7 +426,7 @@ function getRetiredFreebsdMachines(){
 
 function getRetiredOpenbsdMachines(){
 
-    getGlobalData
+    
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getRetiredOpenbsdMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -465,7 +454,7 @@ function getRetiredOpenbsdMachines(){
 
 function getRetiredLinuxMachines(){
 
-    getGlobalData
+    
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getRetiredLinuxMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -493,7 +482,7 @@ function getRetiredLinuxMachines(){
 
 function getRetiredOtherMachines(){
 
-    getGlobalData
+    
     echo "Name, IP Address, Operating System, Points, Rating, User Owns, Root Owns, Retired, Release Date, Retired Date, Free Lab, Machine ID" >> getRetiredOtherMachines
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -521,7 +510,7 @@ function getRetiredOtherMachines(){
 
 function getSpawnedMachines(){
 
-    getGlobalData
+    
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
 
@@ -558,7 +547,7 @@ function getSpawnedMachines(){
 
 function getOwnedMachines(){
 
-    getGlobalData
+    
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
 
@@ -586,7 +575,7 @@ function getOwnedMachines(){
 
 function getActiveOwnedMachines(){
 
-    getGlobalData
+    
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
 
@@ -616,7 +605,7 @@ function getActiveOwnedMachines(){
 
 function searchMachineName(){
 
-    getGlobalData
+    
     s_machine_name=$1
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -647,7 +636,7 @@ function searchMachineName(){
 
 function searchIPAddress(){
 
-    getGlobalData
+    
     ipAddress=$1
 
     id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
@@ -884,6 +873,47 @@ function assignMachine(){
     tput cnorm; rm searchMachineName 2>/dev/null
 }
 
+function sendFlags(){
+
+    if [[ ! $(echo $1) =~ "=" ]]; then
+	helpPanel
+	exit 1
+    fi
+
+    f_machine_name=$(echo $1 | cut -d "=" -f1)
+    flag=$(echo $1 | cut -d "=" -f2)
+
+    id=0; while [ "$field_value" != "null,null,null,null,null,null,null,null,null,null,null,null" ]; do
+        field_value=$(cat $tmp_file | jq ".[$id][\"name\",\"ip\",\"os\",\"points\",\"rating\",\"user_owns\",\"root_owns\",\"retired\",\"release\",\"retired_date\",\"free\",\"id\"]" | tr -d '"' | xargs | tr ' ' ',')
+        if [ "$(echo $field_value)" == "null,null,null,null,null,null,null,null,null,null,null,null" ]; then
+            break
+        fi
+
+        echo $field_value | sed 's/true/Yes/g' | sed 's/false/No/g' | sed 's/null/Is Active/' >> searchMachineName
+        let id+=1
+    done
+
+    id=$(cat searchMachineName | grep -i $f_machine_name | cut -d "," -f12 2>/dev/null)
+
+    if [ "$(cat searchMachineName | wc -l)" != "0" ]; then
+	response=$(curl -s "https://www.hackthebox.eu/api/machines/own" -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0" -H "Authorization: Bearer $API_TOKEN" -H "Content-Type: application/x-www-form-urlencoded" -d "flag=$flag&difficulty=50&id=$id" | jq ".[\"status\"]" | tr -d '"')
+	if [[ $response =~ "Incorrect" ]]; then
+		echo -e "${redColour}[!] $response${endColour}"
+	elif [[ $response =~ "found" ]]; then
+		echo -e "${redColour}[!] $response${endColour}"
+	else
+		echo -e "${greenColour}[+] $response${endColour}"
+	fi
+	echo -ne "${greenColour}"
+        echo -ne "${endColour}"
+	tput cnorm; rm searchMachineName 2>/dev/null
+    else
+	echo -e "\n${redColour}[!] There is no machine with that name${endColour}\n"
+	rm searchMachineName 2>/dev/null; tput cnorm
+	exit 1
+    fi
+}
+
 function downloadVPN(){
     tput cnorm
     echo -e "\n${yellowColour}[*]${endColour}${grayColour} You need to login first...${endColour}\n"
@@ -955,7 +985,8 @@ function helpPanel(){
     echo -e "\t${grayColour}[-k]${endColour}${yellowColour} Stop a machine${endColour} ${blueColour}\t\t\t (Example: -k Hawk)${endColour}${redColour} [Only for VIP members]${endColour}\n"
     echo -e "\t${grayColour}[-a]${endColour}${yellowColour} Assign a machine${endColour} ${blueColour}\t\t\t (Example: -a Lame)${endColour}${redColour} [Only for VIP members]${endColour}\n"
     echo -e "\t${grayColour}[-x]${endColour}${yellowColour} Extend a machine time${endColour} ${blueColour}\t\t (Example: -x Legacy)${endColour}${redColour} [Only for VIP members]${endColour}\n"
-    echo -e "\t${grayColour}[-f]${endColour}${yellowColour} Search username${endColour} ${blueColour}\t\t\t (Example: -f s4vitar)${endColour}\n"
+    echo -e "\t${grayColour}[-f]${endColour}${yellowColour} Send a flag${endColour} ${blueColour}\t\t\t (Example: -f Bucket=flag123)${endColour}\n"
+    echo -e "\t${grayColour}[-u]${endColour}${yellowColour} Search username${endColour} ${blueColour}\t\t\t (Example: -u s4vitar)${endColour}\n"
     echo -e "\t${grayColour}[-c]${endColour}${yellowColour} Show latest shoutbox messages${endColour}${blueColour}\t (Example: -c 50)${endColour}\n"
     echo -e "\t${grayColour}[-w]${endColour}${yellowColour} Who is chatting${endColour}${blueColour}\t\t\t (Example: -w 50)${endColour}\n"
     echo -e "\t${grayColour}[-v]${endColour}${yellowColour} Download VPN${endColour}${blueColour}\t\t\t (Example: -v s4vitar.ovpn)${endColour}\n"
@@ -963,12 +994,12 @@ function helpPanel(){
 }
 
 dependencies; parameter_counter=0
-tput civis; while getopts ":e:s:i:f:r:c:w:d:k:x:a:v:h:" arg; do
+tput civis; while getopts ":e:s:i:u:r:c:w:d:k:x:a:v:f:h:" arg; do
     case $arg in
 	e) explorer_mode=$OPTARG && let parameter_counter+=1;;
 	s) search_machine_name=$OPTARG && let parameter_counter+=1;;
         i) ip_address=$OPTARG && let parameter_counter+=1;;
-        f) user_name=$OPTARG && let parameter_counter+=1;;
+        u) user_name=$OPTARG && let parameter_counter+=1;;
         r) reset_machineName=$OPTARG && let parameter_counter+=1;;
         c) shoutbox_messages=$OPTARG && let parameter_counter+=1;;
         w) whois_messages=$OPTARG && let parameter_counter+=1;;
@@ -976,6 +1007,7 @@ tput civis; while getopts ":e:s:i:f:r:c:w:d:k:x:a:v:h:" arg; do
         k) machine_to_stop=$OPTARG && let parameter_counter+=1;;
         x) machine_to_extend=$OPTARG && let parameter_counter+=1;;
         a) machine_to_assign=$OPTARG && let parameter_counter+=1;;
+        f) send_flag=$OPTARG && let parameter_counter+=1;;
         v) download_vpn=$OPTARG;;
 	h) helpPanel;;
     esac
@@ -1012,6 +1044,11 @@ fi
 
 if [ $machine_to_stop ] && [ $API_TOKEN ]; then
     stopMachine $machine_to_stop
+    rm tmp.json 2>/dev/null; exit 0
+fi
+
+if [ $send_flag ] && [ $API_TOKEN ]; then
+    sendFlags $send_flag
     rm tmp.json 2>/dev/null; exit 0
 fi
 
