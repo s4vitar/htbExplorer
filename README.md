@@ -144,9 +144,6 @@ En caso de querer descargarte la VPN, ya no es necesario abrir el navegador. A t
     style="float: left; margin-right: 10px;" />
 </p>
                                 
+Para enviar una flag desde htbExplorer, tan sólo será necesario seguir la siguiente sintaxis de ejecución:
 
-TODO
-======
-* Poder hacer submit de una flag desde htbExplorer
-* Indicar si eres propietario de alguna máquina, obteniendo el nombre de esta
-
+* htbExplorer -f Mirai=abdbfa61bdfa617abdfa9d8b98fe98a
