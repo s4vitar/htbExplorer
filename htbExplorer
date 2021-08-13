@@ -917,7 +917,7 @@ function sendFlags(){
 function downloadVPN(){
     tput cnorm
     echo -e "\n${yellowColour}[*]${endColour}${grayColour} You need to login first...${endColour}\n"
-    python downloadVPN.py $1
+    python3 downloadVPN.py $1
     echo -e "\n${greenColour}[V]${endColour}${grayColour} The VPN has been download successfuly${endColour}"
 }
 
