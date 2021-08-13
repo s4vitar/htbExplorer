@@ -789,6 +789,15 @@ function deployMachine(){
         echo -e "\n${redColour}[!] It was not posible to deploy the machine${endColour}\n"
     else
         echo -e "\n${yellowColour}[*]${endColour}${grayColour} $response${endColour}\n"
+		IFS=', ' read -r -a array <<< "$(cat searchMachineName | grep "$deployMachineName,")"
+		target_name="$(echo "${array[0]}" | tr '[:upper:]' '[:lower:]').htb"
+		if grep -q "$target_name" "/etc/hosts"  ; then
+			msg_etc="${target_name} already exists in /etc/hosts" ;
+		else
+			echo -e "${array[1]} \t$target_name" >> /etc/hosts
+			msg_etc="${target_name} added to /etc/hosts"
+		fi
+		echo -e "\n${yellowColour}[*]${endColour}${grayColour}$msg_etc${endColour}\n"
     fi
 
     tput cnorm; rm searchMachineName 2>/dev/null
