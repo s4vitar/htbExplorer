@@ -37,7 +37,7 @@ fi
 # Check if user has connection
 ping -c 1 hackthebox.eu &>/dev/null 
 if [[ $? -ne 0 ]]; then
-	echo -ne "${redColour}[!] You have no connectivity with HackTheBox API...${endColour}\n"
+	echo -ne "${redColour}[!] You have no connectivity with HackTheBox...${endColour}\n"
 	exit 1
 fi
 
@@ -955,7 +955,7 @@ function dependencies(){
 			if [ ! "$(command -v $program)" ]; then
 				echo -e "${redColour}[X]${endColour}${grayColour} $program${endColour}${yellowColour} is not installed${endColour}"; sleep 1
 				echo -e "\n${yellowColour}[i]${endColour}${grayColour} Installing...${endColour}"; sleep 1
-				if [ $OS_RELEASE == "Arch Linux" ]; then
+				if [[ $OS_RELEASE == "Arch Linux" ]]; then
 					pacman -S $program --noconfirm > /dev/null 2>&1
 				else
 					apt install $program -y > /dev/null 2>&1
