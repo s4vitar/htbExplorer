@@ -34,6 +34,14 @@ if [ ! "$API_TOKEN" ]; then
 	exit 1
 fi
 
+# Check if user has connection
+ping -c 1 hackthebox.eu &>/dev/null 
+if [[ $? -ne 0 ]]; then
+	echo -ne "${redColour}[!] You have no connectivity with HackTheBox...${endColour}\n"
+	exit 1
+fi
+
+
 function banner(){
     echo -e "${greenColour}
                       .
@@ -152,12 +160,18 @@ function trimString(){
 }
 
 function generateFiles(){
-
     echo '' > $tmp_file
-
     while [ "$(cat $tmp_file | wc -l)" != "0" ]; do
         curl -s -H "$USER_AGENT" "$url_machines_get_all?api_token=$API_TOKEN" -X GET -L | tr "'" '"' | sed 's/None/\"None\"/g' | sed 's/True/\"True\"/g' | sed 's/False/\"False\"/g' > $tmp_file
     done
+
+	# Check if document has parsed correctly
+	grep -E "\<DOCTYPE html\>" $tmp_file &>/dev/null
+	if [[ $? -eq 0 ]]; then
+		echo -ne "${redColour}[!] Document couldn't be parsed correctly, please verify if your API TOKEN is valid!${endColour}\n"
+		tput cnorm
+		exit 1
+	fi
 }
 
 getAllMachines(){
@@ -941,8 +955,11 @@ function dependencies(){
 			if [ ! "$(command -v $program)" ]; then
 				echo -e "${redColour}[X]${endColour}${grayColour} $program${endColour}${yellowColour} is not installed${endColour}"; sleep 1
 				echo -e "\n${yellowColour}[i]${endColour}${grayColour} Installing...${endColour}"; sleep 1
-
-				apt install $program -y > /dev/null 2>&1
+				if [[ $OS_RELEASE == "Arch Linux" ]]; then
+					pacman -S $program --noconfirm > /dev/null 2>&1
+				else
+					apt install $program -y > /dev/null 2>&1
+				fi
 
 				echo -e "\n${greenColour}[V]${endColour}${grayColour} $program${endColour}${yellowColour} installed${endColour}\n"; sleep 2
 			fi
